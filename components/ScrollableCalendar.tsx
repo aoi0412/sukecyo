@@ -1,10 +1,17 @@
 import ja from "@fullcalendar/core/locales/ja";
 import timegrid from "@fullcalendar/timegrid";
 import FullCalendar from "@fullcalendar/react";
-import { useCallback, useId } from "react";
-import { DateSelectArg } from "@fullcalendar/core";
+import {
+  DateSelectArg,
+  EventInput,
+  EventSourceInput,
+} from "@fullcalendar/core";
+import { FC } from "preact/compat";
 
-const ScrollableCalendar = () => {
+type Props = { events: EventSource[] };
+
+const ScrollableCalendar: FC<Props> = ({ events }) => {
+  console.log("events is", events);
   const onSelect = (selectInfo: DateSelectArg) => {
     console.log("aiueo");
     let title = prompt("イベントのタイトルを入力してください")?.trim();
@@ -22,7 +29,13 @@ const ScrollableCalendar = () => {
   };
   return (
     <div>
-      <FullCalendar locale={ja} selectable={true} select={onSelect} />
+      <FullCalendar
+        locale="ja"
+        plugins={[timegrid]}
+        selectable={true}
+        select={onSelect}
+        events={events}
+      />
     </div>
   );
 };

@@ -1,9 +1,38 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+/* eslint-disable react-hooks/exhaustive-deps */
+import { initializeApp } from "firebase/app";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+} from "firebase/firestore";
+import type { NextPage } from "next";
+import Head from "next/head";
+import Image from "next/image";
+import { useEffect } from "react";
+import { firebaseApp } from "../firebase";
+import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
+  useEffect(() => {
+    const firebase = async () => {
+      try {
+        const db = getFirestore(firebaseApp);
+        const col = collection(db, "calendar");
+        const querySnapshot = await getDocs(col);
+        const ret: any = [];
+        querySnapshot.forEach((doc) => {
+          ret.push(doc.data());
+        });
+        console.log(ret);
+        // setData(ret);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    firebase();
+  }, []);
   return (
     <div className={styles.container}>
       <Head>
@@ -18,7 +47,7 @@ const Home: NextPage = () => {
         </h1>
 
         <p className={styles.description}>
-          Get started by editing{' '}
+          Get started by editing{" "}
           <code className={styles.code}>pages/index.tsx</code>
         </p>
 
@@ -59,14 +88,14 @@ const Home: NextPage = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <span className={styles.logo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
         </a>
       </footer>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
