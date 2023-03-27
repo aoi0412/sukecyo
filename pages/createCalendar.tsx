@@ -3,8 +3,15 @@ import FullCalendar from "@fullcalendar/react";
 import timegridPlugin from "@fullcalendar/timegrid";
 import { Calendar, DateSelectArg, EventHoveringArg } from "@fullcalendar/core";
 import interactionPlugin from "@fullcalendar/interaction";
-import { LegacyRef, MutableRefObject, useRef, useState } from "react";
+import {
+  LegacyRef,
+  MutableRefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { uploadCalendar } from "../functions/calendar";
+import { saveCalendarList } from "../functions/localStorage";
 const createCalendar = () => {
   const [calendarName, setCalendarName] = useState<string>("");
   const id: string = new Date().getTime().toString();
@@ -35,6 +42,7 @@ const createCalendar = () => {
           const calendarApi = calendarRef.current.getApi();
           console.log("events is", calendarApi.getEvents());
           uploadCalendar({ calendarApi, calendarName, id });
+          saveCalendarList({ id: id, name: calendarName });
         }}
       >
         OK
@@ -49,7 +57,6 @@ const createCalendar = () => {
         eventStartEditable={true}
         eventResizableFromStart={true}
         eventClick={eventMouseClick}
-        dayCount={100}
         slotDuration="01:00:00"
         snapDuration="00:10:00"
       />

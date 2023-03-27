@@ -2,6 +2,7 @@ import { CalendarApi } from "@fullcalendar/core";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
 import { firebaseApp } from "../firebase";
 import { calendar, calendarMember, event } from "../types/calendar";
+import { saveCalendarList } from "./localStorage";
 
 type uploadCalendarProp = {
   calendarApi: CalendarApi;
