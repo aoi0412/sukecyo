@@ -3,12 +3,13 @@ import FullCalendar from "@fullcalendar/react";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { firebaseApp } from "../../firebase";
 import { calendar } from "../../types/calendar";
 import timegridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import Link from "next/link";
+import { calcRateOfMember } from "../../functions/calendar";
 
 const calendarPage: NextPage = () => {
   const router = useRouter();
@@ -29,12 +30,33 @@ const calendarPage: NextPage = () => {
   return (
     <div>
       <p>{id}</p>
-      <Link href={"http://localhost:3000/joinCalendar/" + id}>join</Link>
+      <Link href={`http://localhost:3000/joinCalendar/${id}`}>join</Link>
+      <p>
+        joinMember:{calendarData && Object.keys(calendarData.joinMember).length}
+      </p>
+      <div>
+        {calendarData?.events
+          .sort((a, b) => {
+            return a.joinMember.length < b.joinMember.length ? 1 : -1;
+          })
+          .map((event) => (
+            <div key={event.id}>
+              <p>{event.id.toString()}</p>
+              <p>
+                rate:
+                {calcRateOfMember({
+                  joinMember: event.joinMember,
+                  allMember: calendarData.joinMember,
+                })}
+              </p>
+            </div>
+          ))}
+      </div>
       <FullCalendar
-        plugins={[timegridPlugin, listPlugin]}
+        plugins={[timegridPlugin]}
         events={calendarData?.events}
         headerToolbar={{
-          right: "timeGridWeek,listDay",
+          right: "timeGridWeek",
         }}
         eventContent={(contentInfo) => {
           console.log("content is", contentInfo.event.extendedProps.joinMember);

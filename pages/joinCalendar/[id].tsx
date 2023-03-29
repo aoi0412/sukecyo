@@ -10,6 +10,7 @@ import timegridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import { DateSelectArg, EventClickArg } from "@fullcalendar/core";
 import { uploadCalendar } from "../../functions/calendar";
+import timegrid from "@fullcalendar/timegrid";
 
 const calendarPage: NextPage = () => {
   const router = useRouter();
@@ -37,12 +38,17 @@ const calendarPage: NextPage = () => {
       selectionInfo.event.id
     );
     if (eventData) {
-      let tmpJoinMember = eventData.extendedProps.joinMember;
-      tmpJoinMember.push(memberId);
+      let tmpJoinMember: string[] = eventData.extendedProps.joinMember;
+      if (tmpJoinMember.find((member) => member === memberId)) {
+        tmpJoinMember = tmpJoinMember.filter((member) => member !== memberId);
+      } else {
+        tmpJoinMember.push(memberId);
+      }
       eventData.setExtendedProp("joinMember", tmpJoinMember);
     }
   };
   const calendarRef = useRef<FullCalendar>(null!);
+
   if (typeof id !== "string") return <></>;
   return (
     <div>
@@ -55,14 +61,19 @@ const calendarPage: NextPage = () => {
           const calendarApi = calendarRef.current.getApi();
           let joinMember = calendarData?.joinMember;
           if (joinMember) {
-            joinMember[memberId] = memberName;
-            uploadCalendar({
-              id,
-              calendarApi,
-              joinMember,
-            });
+            if (memberName) {
+              joinMember[memberId] = memberName;
+              uploadCalendar({
+                id,
+                calendarApi,
+                joinMember,
+              });
+              router.replace(`/calendar/${id}`);
+            } else {
+              alert("名前を入力してください");
+            }
           } else {
-            alert("名前を入力してください");
+            alert("エラーが起きましたもう一度お試しください");
           }
         }}
       >
@@ -75,14 +86,22 @@ const calendarPage: NextPage = () => {
         plugins={[timegridPlugin, listPlugin]}
         events={calendarData?.events}
         headerToolbar={{
-          right: "timeGridWeek,listDay",
+          right: "timeGridWeek,listYear",
         }}
+        eventMinHeight={60}
         selectable={true}
         eventClick={handleEventSelect}
         eventContent={(contentInfo) => {
           console.log("content is", contentInfo.event.extendedProps.joinMember);
           return (
             <div>
+              <div>
+                {(contentInfo.event.extendedProps.joinMember as string[]).find(
+                  (member) => member === memberId
+                )
+                  ? "✔"
+                  : "✘"}
+              </div>
               {contentInfo.event.extendedProps.joinMember.map(
                 (name: string, index: number) => (
                   <p key={index}>{name}</p>

@@ -40,3 +40,20 @@ export const uploadCalendar = ({
     joinMember: joinMember ? joinMember : {},
   } as calendar);
 };
+
+export const calcRateOfMember = ({
+  joinMember,
+  allMember,
+}: {
+  joinMember: string[];
+  allMember: calendarMember;
+}): number => {
+  const joinNum: number = joinMember.length;
+  const allNum: number = Object.keys(allMember).length;
+  if (allNum !== 0) {
+    const rate = joinNum / allNum;
+    return Math.round(rate * 100);
+  } else {
+    return 0;
+  }
+};

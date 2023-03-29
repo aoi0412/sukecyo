@@ -33,12 +33,20 @@ const Home: NextPage = () => {
       </Head>
       <div>
         {calendarList.map((calendar) => (
-          <a
-            href={`http://localhost:3000/calendar/${calendar.id}}`}
+          <div
             key={calendar.id}
+            style={{
+              padding: "12px",
+              backgroundColor: "red",
+              margin: "8px",
+              width: "100px",
+              height: "100px",
+            }}
           >
-            {calendar.name}
-          </a>
+            <a href={`http://localhost:3000/calendar/${calendar.id}`}>
+              {calendar.name}
+            </a>
+          </div>
         ))}
         <a href="http://localhost:3000/createCalendar">新規作成</a>
       </div>
