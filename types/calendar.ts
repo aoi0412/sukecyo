@@ -6,6 +6,7 @@ export type calendar = {
   URL: string;
   events: event[];
   joinMember: calendarMember;
+  confirmedEvent: null | event;
 };
 export type event = {
   id: string;

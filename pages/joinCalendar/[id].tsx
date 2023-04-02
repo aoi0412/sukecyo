@@ -1,16 +1,21 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import FullCalendar from "@fullcalendar/react";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { firebaseApp } from "../../firebase";
-import { calendar } from "../../types/calendar";
 import timegridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
-import { DateSelectArg, EventClickArg } from "@fullcalendar/core";
-import { uploadCalendar } from "../../functions/calendar";
-import timegrid from "@fullcalendar/timegrid";
+import googleCalendarPlugin from "@fullcalendar/google-calendar";
+import { EventClickArg } from "@fullcalendar/core";
+import axios from "axios";
+import { useRecoilState } from "recoil";
+import { currentCalendarAtom, currentEventsAtom } from "../../recoil";
+import { updateCalendarJoinMember } from "../../functions/updateCalendar";
+import { showError } from "../../functions/error";
+import { saveCalendarList } from "../../functions/localStorage";
+import { colors } from "../../styles/colors";
+import StepTitle from "../../components/StepTitle";
+import { css } from "@emotion/react";
 
 const calendarPage: NextPage = () => {
   const router = useRouter();
@@ -18,27 +23,16 @@ const calendarPage: NextPage = () => {
   const [memberId, setMemberId] = useState<string>(
     new Date().getTime().toString()
   );
-  const [calendarData, setCalendarData] = useState<calendar | null>(null);
+  const [calendarData, setCalendarData] = useRecoilState(currentCalendarAtom);
+  const [eventData, setEventData] = useRecoilState(currentEventsAtom);
   const [memberName, setMemberName] = useState<string>("");
-  useEffect(() => {
-    console.log(id);
-    if (typeof id === "string") {
-      const db = getFirestore(firebaseApp);
-      const docRef = doc(db, "calendar", id);
-      getDoc(docRef).then((doc) => {
-        const docData = doc.data() as calendar;
-        setCalendarData(docData);
-        console.log("docData is", docData);
-      });
-    }
-  }, [id]);
   const handleEventSelect = (selectionInfo: EventClickArg) => {
     console.log("selectionInfo: ", selectionInfo); // 選択した範囲の情報をconsoleに出力
     const eventData = selectionInfo.view.calendar.getEventById(
       selectionInfo.event.id
     );
-    if (eventData) {
-      let tmpJoinMember: string[] = eventData.extendedProps.joinMember;
+    if (eventData && eventData.extendedProps.joinMember) {
+      let tmpJoinMember: string[] = [...eventData.extendedProps.joinMember];
       if (tmpJoinMember.find((member) => member === memberId)) {
         tmpJoinMember = tmpJoinMember.filter((member) => member !== memberId);
       } else {
@@ -48,27 +42,104 @@ const calendarPage: NextPage = () => {
     }
   };
   const calendarRef = useRef<FullCalendar>(null!);
-
+  useEffect(() => {
+    if (calendarRef.current) {
+      const calendarApi = calendarRef.current.getApi();
+      calendarApi.addEventSource({
+        googleCalendarId:
+          "e1f4968945138f2406fb11b7c048d4bdc89c600bc08feca06c0cb0d7bbfedbfc@group.calendar.google.com",
+        googleCalendarApiKey: process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY,
+        display: "auto",
+        color: "rgba(0,0,0,0.5)",
+      });
+    }
+  }, [calendarRef.current]);
   if (typeof id !== "string") return <></>;
+  if (calendarData === null) {
+    router.back();
+    return <>カレンダーのデータが存在しません</>;
+  }
+  if (eventData.length === 0) return <>イベントデータが存在しません</>;
+
   return (
     <div>
-      <input
-        value={memberName}
-        onChange={(e) => setMemberName(e.currentTarget.value)}
-      />
+      <div>
+        <StepTitle title="自分の名前を入力" step={1} />
+        <input
+          value={memberName}
+          onChange={(e) => setMemberName(e.currentTarget.value)}
+        />
+      </div>
+
+      <div>
+        <StepTitle title="候補から参加できる日時を選択" step={2} />
+        <button
+          onClick={async () => {
+            const response = await axios.get(
+              "http://localhost:3000/api/generate-google-oauth-url"
+            );
+            const { authorizeUrl } = response.data;
+
+            // Google認証ページを別タブで開く
+            window.open(authorizeUrl, "_blank");
+          }}
+        >
+          認証する
+        </button>
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[timegridPlugin, listPlugin, googleCalendarPlugin]}
+          events={eventData}
+          headerToolbar={{
+            right: "timeGridWeek,listYear,today,prev,next",
+          }}
+          eventColor={colors.accent}
+          googleCalendarApiKey={process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY}
+          eventMinHeight={60}
+          selectable={true}
+          eventClick={handleEventSelect}
+          eventContent={(contentInfo) => {
+            console.log(contentInfo);
+          }}
+        />
+      </div>
       <button
+        css={css`
+          width: 100%;
+          background-color: ${colors.accent};
+          border-radius: 20px;
+          margin: 8px 32px;
+          max-width: 300px;
+          padding: 12px 8px;
+          border: none;
+          align-self: center;
+          color: ${colors.white};
+          font-weight: bold;
+        `}
         onClick={() => {
-          const calendarApi = calendarRef.current.getApi();
-          let joinMember = calendarData?.joinMember;
+          let joinMember = { ...calendarData?.joinMember };
           if (joinMember) {
             if (memberName) {
               joinMember[memberId] = memberName;
-              uploadCalendar({
+              updateCalendarJoinMember({
                 id,
-                calendarApi,
-                joinMember,
-              });
-              router.replace(`/calendar/${id}`);
+                eventData,
+                memberId,
+                memberName,
+              })
+                .then(() => {
+                  saveCalendarList({
+                    id,
+                    name: calendarData.name,
+                  });
+                  router.replace(`/calendar/${id}`);
+                })
+                .catch((error) => {
+                  showError({
+                    title: error.title,
+                    message: error.message,
+                  });
+                });
             } else {
               alert("名前を入力してください");
             }
@@ -79,38 +150,6 @@ const calendarPage: NextPage = () => {
       >
         OK
       </button>
-      <p>{memberId}</p>
-      <p>{id}</p>
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[timegridPlugin, listPlugin]}
-        events={calendarData?.events}
-        headerToolbar={{
-          right: "timeGridWeek,listYear",
-        }}
-        eventMinHeight={60}
-        selectable={true}
-        eventClick={handleEventSelect}
-        eventContent={(contentInfo) => {
-          console.log("content is", contentInfo.event.extendedProps.joinMember);
-          return (
-            <div>
-              <div>
-                {(contentInfo.event.extendedProps.joinMember as string[]).find(
-                  (member) => member === memberId
-                )
-                  ? "✔"
-                  : "✘"}
-              </div>
-              {contentInfo.event.extendedProps.joinMember.map(
-                (name: string, index: number) => (
-                  <p key={index}>{name}</p>
-                )
-              )}
-            </div>
-          );
-        }}
-      />
     </div>
   );
 };
