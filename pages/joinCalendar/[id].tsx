@@ -16,6 +16,10 @@ import { saveCalendarList } from "../../functions/localStorage";
 import { colors } from "../../styles/colors";
 import StepTitle from "../../components/StepTitle";
 import { css } from "@emotion/react";
+import CheckIcon from "../../public/check.svg";
+import { google } from "googleapis";
+import GoogleIcon from "../../public/google.svg";
+import { event } from "../../types/calendar";
 
 const calendarPage: NextPage = () => {
   const router = useRouter();
@@ -23,37 +27,59 @@ const calendarPage: NextPage = () => {
   const [memberId, setMemberId] = useState<string>(
     new Date().getTime().toString()
   );
+
   const [calendarData, setCalendarData] = useRecoilState(currentCalendarAtom);
   const [eventData, setEventData] = useRecoilState(currentEventsAtom);
+  const [selectedEvents, setSelectesEvents] = useState<event[]>([]);
   const [memberName, setMemberName] = useState<string>("");
+  const [googleCalendarList, setGoogleCalendarList] = useState<
+    {
+      color: string;
+      name: string;
+    }[]
+  >([]);
   const handleEventSelect = (selectionInfo: EventClickArg) => {
     console.log("selectionInfo: ", selectionInfo); // 選択した範囲の情報をconsoleに出力
-    const eventData = selectionInfo.view.calendar.getEventById(
-      selectionInfo.event.id
-    );
-    if (eventData && eventData.extendedProps.joinMember) {
-      let tmpJoinMember: string[] = [...eventData.extendedProps.joinMember];
-      if (tmpJoinMember.find((member) => member === memberId)) {
-        tmpJoinMember = tmpJoinMember.filter((member) => member !== memberId);
-      } else {
-        tmpJoinMember.push(memberId);
-      }
-      eventData.setExtendedProp("joinMember", tmpJoinMember);
-    }
-  };
-  const calendarRef = useRef<FullCalendar>(null!);
-  useEffect(() => {
-    if (calendarRef.current) {
-      const calendarApi = calendarRef.current.getApi();
-      calendarApi.addEventSource({
-        googleCalendarId:
-          "e1f4968945138f2406fb11b7c048d4bdc89c600bc08feca06c0cb0d7bbfedbfc@group.calendar.google.com",
-        googleCalendarApiKey: process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY,
-        display: "auto",
-        color: "rgba(0,0,0,0.5)",
+    let tmpEventData = [...selectedEvents];
+    const event = selectionInfo.event;
+    if (tmpEventData.some((_) => _.id === event.id)) {
+      tmpEventData = tmpEventData.filter((_) => _.id !== event.id);
+    } else {
+      let tmpJoinMember = [...event.extendedProps.joinMember];
+      tmpJoinMember.push(memberId);
+      tmpEventData.push({
+        id: event.id,
+        end: event.endStr,
+        start: event.startStr,
+        joinMember: tmpJoinMember,
       });
     }
-  }, [calendarRef.current]);
+    setSelectesEvents(tmpEventData);
+  };
+  const calendarRef = useRef<FullCalendar>(null!);
+
+  useEffect(() => {
+    if (calendarRef.current) {
+      window.onstorage = (event) => {
+        if (event.key != "googleCalendarData") return;
+        const calendarApi = calendarRef.current.getApi();
+        if (event.newValue) {
+          const googleCalendarList = JSON.parse(event.newValue);
+          if (Array.isArray(googleCalendarList)) {
+            let tmpGoogleCalendarList: { name: string; color: string }[] = [];
+            googleCalendarList.forEach((calendar) => {
+              calendarApi.addEventSource(calendar);
+              tmpGoogleCalendarList.push({
+                color: calendar.color,
+                name: calendar.title,
+              });
+            });
+            setGoogleCalendarList(tmpGoogleCalendarList);
+          }
+        }
+      };
+    }
+  }, []);
   if (typeof id !== "string") return <></>;
   if (calendarData === null) {
     router.back();
@@ -62,7 +88,51 @@ const calendarPage: NextPage = () => {
   if (eventData.length === 0) return <>イベントデータが存在しません</>;
 
   return (
-    <div>
+    <div
+      css={css`
+        display: flex;
+        flex: 1;
+        height: 100%;
+        flex-direction: column;
+        padding: 20px;
+        max-width: 1000px;
+      `}
+    >
+      <button
+        css={css`
+          position: absolute;
+          top: 80px;
+          right: 12px;
+          width: 40px;
+          height: 40px;
+          background-color: ${colors.main};
+          margin: 0;
+          padding: 0;
+          border: none;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        `}
+        onClick={async () => {
+          const response = await axios.get(
+            "http://localhost:3000/api/generate-google-oauth-url"
+          );
+          const { authorizeUrl } = response.data;
+          console.log("response", response);
+
+          // Google認証ページを別タブで開く
+          window.open(authorizeUrl, "_blank");
+        }}
+      >
+        <GoogleIcon
+          fill={colors.white}
+          css={css`
+            width: 20px;
+            height: 20px;
+          `}
+        />
+      </button>
       <div>
         <StepTitle title="自分の名前を入力" step={1} />
         <input
@@ -71,38 +141,68 @@ const calendarPage: NextPage = () => {
         />
       </div>
 
-      <div>
-        <StepTitle title="候補から参加できる日時を選択" step={2} />
-        <button
-          onClick={async () => {
-            const response = await axios.get(
-              "http://localhost:3000/api/generate-google-oauth-url"
-            );
-            const { authorizeUrl } = response.data;
-
-            // Google認証ページを別タブで開く
-            window.open(authorizeUrl, "_blank");
-          }}
-        >
-          認証する
-        </button>
-        <FullCalendar
-          ref={calendarRef}
-          plugins={[timegridPlugin, listPlugin, googleCalendarPlugin]}
-          events={eventData}
-          headerToolbar={{
-            right: "timeGridWeek,listYear,today,prev,next",
-          }}
-          eventColor={colors.accent}
-          googleCalendarApiKey={process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY}
-          eventMinHeight={60}
-          selectable={true}
-          eventClick={handleEventSelect}
-          eventContent={(contentInfo) => {
-            console.log(contentInfo);
-          }}
-        />
+      <StepTitle title="候補から参加できる日時を選択" step={2} />
+      <div
+        css={css`
+          display: flex;
+          align-items: center;
+        `}
+      >
+        {googleCalendarList.map((googleCalendar) => (
+          <div
+            key={googleCalendar.name}
+            css={css`
+              display: flex;
+              align-items: center;
+            `}
+          >
+            <div
+              css={css`
+                background-color: ${googleCalendar.color};
+                width: 20px;
+                height: 20px;
+                border-radius: 8px;
+              `}
+            />
+            <p>{googleCalendar.name}</p>
+          </div>
+        ))}
       </div>
+      <FullCalendar
+        visibleRange={{
+          start: new Date(),
+        }}
+        showNonCurrentDates={true}
+        ref={calendarRef}
+        plugins={[timegridPlugin, listPlugin, googleCalendarPlugin]}
+        events={eventData}
+        headerToolbar={{
+          right: "timeGridWeek,listYear,today,prev,next",
+        }}
+        height={"100%"}
+        eventColor={colors.accent}
+        googleCalendarApiKey={process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY}
+        eventMinHeight={60}
+        selectable={true}
+        eventClick={handleEventSelect}
+        eventContent={(contentInfo) => {
+          if (contentInfo.event.title)
+            return <div>{contentInfo.event.title}</div>;
+          else if (selectedEvents.some((_) => _.id === contentInfo.event.id))
+            return (
+              <div>
+                <CheckIcon
+                  fill={colors.white}
+                  css={css`
+                    width: 20px;
+                    height: 20px;
+                  `}
+                />
+              </div>
+            );
+          else return <></>;
+        }}
+      />
       <button
         css={css`
           width: 100%;
@@ -120,10 +220,11 @@ const calendarPage: NextPage = () => {
           let joinMember = { ...calendarData?.joinMember };
           if (joinMember) {
             if (memberName) {
+              console.log("eventData is", selectedEvents);
               joinMember[memberId] = memberName;
               updateCalendarJoinMember({
                 id,
-                eventData,
+                eventData: selectedEvents,
                 memberId,
                 memberName,
               })

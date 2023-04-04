@@ -11,6 +11,10 @@ import { css } from "@emotion/react";
 import { colors } from "../styles/colors";
 import { baseURL } from "../baseURL";
 import { deleteCalendarList } from "../functions/localStorage";
+import EditIcon from "../public/edit.svg";
+import CloseIcon from "../public/cross.svg";
+import ArrowIcon from "../public/angle-right.svg";
+import TrashIcon from "../public/trash.svg";
 
 const Home: NextPage = () => {
   const [calendarList, setCalendarList] = useState<calendar[]>([]);
@@ -77,7 +81,13 @@ const Home: NextPage = () => {
                 border-radius: 8px;
               `}
             >
-              ✕
+              <CloseIcon
+                fill={colors.white}
+                css={css`
+                  width: 16px;
+                  height: 16px;
+                `}
+              />
             </button>
           ) : (
             <button
@@ -90,9 +100,18 @@ const Home: NextPage = () => {
                 padding: 0;
                 border: none;
                 border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
               `}
             >
-              ☑
+              <EditIcon
+                fill={colors.white}
+                css={css`
+                  width: 20px;
+                  height: 20px;
+                `}
+              />
             </button>
           )}
 
@@ -168,6 +187,12 @@ const Home: NextPage = () => {
             </div>
             {isEditable ? (
               <button
+                css={css`
+                  padding: 16px;
+                  margin-right: 12px;
+                  border: none;
+                  background-color: ${colors.white};
+                `}
                 onClick={() => {
                   deleteCalendarList(calendar.id);
                   let tmpList = [...calendarList];
@@ -175,10 +200,35 @@ const Home: NextPage = () => {
                   setCalendarList(tmpList);
                 }}
               >
-                d
+                <TrashIcon
+                  fill={colors.dark}
+                  css={css`
+                    width: 32px;
+                    height: 32px;
+                  `}
+                />
               </button>
             ) : (
-              <a href={`${baseURL}/calendar/${calendar.id}`}>{">"}</a>
+              <a
+                href={`${baseURL}/calendar/${calendar.id}`}
+                css={css`
+                  transition: transform 0.2s ease-in-out;
+                  padding: 16px;
+                  margin-right: 12px;
+                  transform: translateX(-12px);
+                  :hover {
+                    transform: translateX(0px);
+                  }
+                `}
+              >
+                <ArrowIcon
+                  fill={colors.dark}
+                  css={css`
+                    width: 32px;
+                    height: 32px;
+                  `}
+                />
+              </a>
             )}
           </div>
         ))}

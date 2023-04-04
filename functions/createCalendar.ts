@@ -22,7 +22,7 @@ export const uploadCalendar = ({
 
   setDoc(docRef, {
     id: id,
-    URL: baseURL + id,
+    URL: baseURL + "/calendar/" + id,
     name: calendarName ? calendarName : calendarApi.view.title,
     joinMember: joinMember ? joinMember : {},
     confirmedEvent: null,

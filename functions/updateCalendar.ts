@@ -7,7 +7,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { firebaseApp } from "../firebase";
-import { calendar, calendarMember, event } from "../types/calendar";
+import { event } from "../types/calendar";
 import { showError } from "./error";
 
 type updateCalendarJoinMemberProp = {
@@ -47,6 +47,7 @@ export const updateCalendarJoinMember = async ({
         message: error.message,
       });
     });
+  1;
 };
 
 //イベントドキュメントをFirestoreに一括作成する

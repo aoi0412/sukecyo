@@ -14,6 +14,7 @@ export default function handler(
     clientId: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
     clientSecret: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_SECRET,
     redirectUri: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URL,
+    // redirectUri: "http://localhost:3000/joinCalendar/1680619785493",
   });
 
   // Google認証画面のURLを生成する
