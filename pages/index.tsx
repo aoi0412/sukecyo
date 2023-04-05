@@ -20,12 +20,13 @@ const Home: NextPage = () => {
   const [calendarList, setCalendarList] = useState<calendar[]>([]);
   const [isEditable, setIsEditable] = useState<boolean>(false);
   useEffect(() => {
-    const tmpCalendarList = getCalendarList();
-    console.log("get", tmpCalendarList);
-    getCalendarListData(tmpCalendarList).then((calendarList) => {
-      console.log("calendarList is", calendarList);
-      console.log("length", calendarList.length);
-      if (calendarList.length !== 0) setCalendarList(calendarList);
+    getCalendarList().then((tmpCalendarList) => {
+      console.log("get", tmpCalendarList);
+      getCalendarListData(tmpCalendarList).then((calendarList) => {
+        console.log("calendarList is", calendarList);
+        console.log("length", calendarList.length);
+        if (calendarList.length !== 0) setCalendarList(calendarList);
+      });
     });
   }, []);
   return (

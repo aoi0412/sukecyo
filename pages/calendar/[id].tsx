@@ -121,19 +121,56 @@ const calendarPage: NextPage = () => {
           value={shareComfirmEvent}
           onChange={(e) => setShareConfirmEvent(e.currentTarget.value)}
         />
-        <a
-          href={createGoogleCalendarURL({
-            title: calendarData.name,
-            details: "details",
-            start: calendarData.confirmedEvent.start,
-            end: calendarData.confirmedEvent.end,
-          })}
+        <button
+          onClick={() => {
+            if (calendarData)
+              global.navigator.clipboard.writeText(shareComfirmEvent);
+            alert("コピーしました！");
+          }}
+          css={css`
+            padding: 8px;
+            background-color: ${colors.white};
+            margin: 0;
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            right: 12px;
+          `}
+        >
+          <CopyIcon
+            fill={colors.main}
+            css={css`
+              width: 20px;
+              height: 20px;
+            `}
+          />
+        </button>
+        <button
+          onClick={() => {
+            if (calendarData.confirmedEvent) {
+              const URL = createGoogleCalendarURL({
+                title: calendarData.name,
+                details: "details",
+                start: calendarData.confirmedEvent.start,
+                end: calendarData.confirmedEvent.end,
+              });
+              window.open(URL);
+            }
+          }}
         >
           カレンダーに追加する
-        </a>
+        </button>
         <button
           onClick={() => {
             if (typeof id === "string") confirmEvents({ event: null, id: id });
+            if (calendarData) {
+              let tmpCalendarData: calendar = { ...calendarData };
+              tmpCalendarData.confirmedEvent = null;
+              setCalendarData(tmpCalendarData);
+            }
           }}
         >
           cancelEvent
@@ -289,36 +326,9 @@ const calendarPage: NextPage = () => {
         >
           {calendarData?.name}
         </p>
-
-        {/* <div>
-        {calendarData &&
-          eventData.map((event) => (
-            // TODOここを実装する
-            <div
-              onClick={() => {
-                if (typeof id === "string") confirmEvents({ event, id });
-              }}
-              key={event.id}
-              style={{
-                backgroundColor: "red",
-              }}
-            >
-              <p>{event.id.toString()}</p>
-              <p>
-                rate:
-                {calcRateOfMember({
-                  joinMember: event.joinMember,
-                  allMember: calendarData.joinMember,
-                })}
-              </p>
-            </div>
-          ))}
-      </div> */}
-
         <div
           style={{
             zIndex: 0,
-            // flexGrow: 1,
             height: "100%",
           }}
         >
@@ -417,6 +427,15 @@ const calendarPage: NextPage = () => {
                   }`;
                   return (
                     <div
+                      onClick={() => {
+                        if (typeof id === "string")
+                          confirmEvents({ event, id });
+                        if (calendarData) {
+                          let tmpCalendarData: calendar = { ...calendarData };
+                          tmpCalendarData.confirmedEvent = event;
+                          setCalendarData(tmpCalendarData);
+                        }
+                      }}
                       key={event.id}
                       css={css`
                         display: flex;

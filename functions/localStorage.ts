@@ -13,6 +13,17 @@ export const saveCalendarList = ({
     if (calendarList.length === 0) {
       calendarList = [];
     }
+    console.log(
+      !calendarList.some((_) => _.id === id),
+      ":",
+      calendarList,
+      ":",
+      id
+    );
+    if (!calendarList.some((_) => _.id === id)) {
+      calendarList.push({ id: id, name: name });
+      localStorage.setItem("calendarList", JSON.stringify(calendarList));
+    }
     calendarList.push({ id: id, name: name });
     localStorage.setItem("calendarList", JSON.stringify(calendarList));
     return calendarList;
@@ -40,7 +51,7 @@ export const deleteCalendarList = (id: string): calendarList => {
   }
 };
 
-export const getCalendarList = (): calendarList => {
+export const getCalendarList = async (): Promise<calendarList> => {
   const calendarListJson = localStorage.getItem("calendarList");
   if (calendarListJson) {
     let calendarList: calendarList = JSON.parse(calendarListJson);
