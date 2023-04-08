@@ -1,16 +1,25 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import FullCalendar from "@fullcalendar/react";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { firebaseApp } from "../../firebase";
-import { calendar } from "../../types/calendar";
 import timegridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
-import { DateSelectArg, EventClickArg } from "@fullcalendar/core";
-import { uploadCalendar } from "../../functions/calendar";
-import timegrid from "@fullcalendar/timegrid";
+import googleCalendarPlugin from "@fullcalendar/google-calendar";
+import { EventClickArg } from "@fullcalendar/core";
+import axios from "axios";
+import { useRecoilState } from "recoil";
+import { currentCalendarAtom, currentEventsAtom } from "../../recoil";
+import { updateCalendarJoinMember } from "../../functions/updateCalendar";
+import { showError } from "../../functions/error";
+import { saveCalendarList } from "../../functions/localStorage";
+import { colors } from "../../styles/colors";
+import StepTitle from "../../components/StepTitle";
+import { css } from "@emotion/react";
+import CheckIcon from "../../public/check.svg";
+import { google } from "googleapis";
+import GoogleIcon from "../../public/google.svg";
+import { event, eventForJoin } from "../../types/calendar";
 
 const calendarPage: NextPage = () => {
   const router = useRouter();
@@ -18,57 +27,262 @@ const calendarPage: NextPage = () => {
   const [memberId, setMemberId] = useState<string>(
     new Date().getTime().toString()
   );
-  const [calendarData, setCalendarData] = useState<calendar | null>(null);
+
+  const [calendarData, setCalendarData] = useRecoilState(currentCalendarAtom);
+  const [eventData, setEventData] = useRecoilState(currentEventsAtom);
+  const [selectedEvents, setSelectesEvents] = useState<eventForJoin[]>([]);
   const [memberName, setMemberName] = useState<string>("");
-  useEffect(() => {
-    console.log(id);
-    if (typeof id === "string") {
-      const db = getFirestore(firebaseApp);
-      const docRef = doc(db, "calendar", id);
-      getDoc(docRef).then((doc) => {
-        const docData = doc.data() as calendar;
-        setCalendarData(docData);
-        console.log("docData is", docData);
-      });
-    }
-  }, [id]);
+  const [googleCalendarList, setGoogleCalendarList] = useState<
+    {
+      color: string;
+      name: string;
+    }[]
+  >([]);
   const handleEventSelect = (selectionInfo: EventClickArg) => {
     console.log("selectionInfo: ", selectionInfo); // 選択した範囲の情報をconsoleに出力
-    const eventData = selectionInfo.view.calendar.getEventById(
-      selectionInfo.event.id
-    );
-    if (eventData) {
-      let tmpJoinMember: string[] = eventData.extendedProps.joinMember;
-      if (tmpJoinMember.find((member) => member === memberId)) {
-        tmpJoinMember = tmpJoinMember.filter((member) => member !== memberId);
-      } else {
-        tmpJoinMember.push(memberId);
-      }
-      eventData.setExtendedProp("joinMember", tmpJoinMember);
+    let tmpEventData = [...selectedEvents];
+    const event = selectionInfo.event;
+    if (tmpEventData.some((_) => _.event.id === event.id)) {
+      const index = tmpEventData.findIndex((_) => _.event.id === event.id);
+      tmpEventData[index].isSelected = false;
+    } else {
+      let tmpJoinMember = [...event.extendedProps.joinMember];
+      tmpJoinMember.push(memberId);
+      tmpEventData.push({
+        isSelected: true,
+        event: {
+          id: event.id,
+          end: event.endStr,
+          start: event.startStr,
+          joinMember: tmpJoinMember,
+        },
+      });
     }
+    setSelectesEvents(tmpEventData);
   };
   const calendarRef = useRef<FullCalendar>(null!);
 
+  useEffect(() => {
+    if (
+      typeof router.query.memberId === "string" &&
+      typeof router.query.memberName === "string"
+    ) {
+      setMemberId(router.query.memberId);
+      setMemberName(router.query.memberName);
+      const calenadrApi = calendarRef.current.getApi();
+      let tmpSelectedList: eventForJoin[] = [];
+      calenadrApi.getEvents().forEach((event) => {
+        const joinMember: string[] = event.extendedProps.joinMember;
+
+        if (joinMember.some((_) => _ === router.query.memberId)) {
+          console.log(
+            "event data is",
+            event,
+            ",is member",
+            joinMember,
+            "id is",
+            router.query.memberId
+          );
+          tmpSelectedList.push({
+            isSelected: true,
+            event: {
+              id: event.id,
+              end: event.endStr,
+              start: event.startStr,
+              joinMember: event.extendedProps.joinMember,
+            },
+          });
+        }
+      });
+      console.log("selected is", tmpSelectedList);
+      setSelectesEvents(tmpSelectedList);
+    }
+    if (calendarRef.current) {
+      window.onstorage = (event) => {
+        if (event.key != "googleCalendarData") return;
+        const calendarApi = calendarRef.current.getApi();
+        if (event.newValue) {
+          const googleCalendarList = JSON.parse(event.newValue);
+          if (Array.isArray(googleCalendarList)) {
+            let tmpGoogleCalendarList: { name: string; color: string }[] = [];
+            googleCalendarList.forEach((calendar) => {
+              calendarApi.addEventSource(calendar);
+              tmpGoogleCalendarList.push({
+                color: calendar.color,
+                name: calendar.title,
+              });
+            });
+            setGoogleCalendarList(tmpGoogleCalendarList);
+          }
+        }
+      };
+    }
+  }, []);
   if (typeof id !== "string") return <></>;
+  if (calendarData === null) {
+    router.back();
+    return <>カレンダーのデータが存在しません</>;
+  }
+  if (eventData.length === 0) return <>イベントデータが存在しません</>;
+
   return (
-    <div>
-      <input
-        value={memberName}
-        onChange={(e) => setMemberName(e.currentTarget.value)}
+    <div
+      css={css`
+        display: flex;
+        flex: 1;
+        height: 100%;
+        flex-direction: column;
+        padding: 20px;
+        max-width: 1000px;
+      `}
+    >
+      <button
+        css={css`
+          position: absolute;
+          top: 80px;
+          right: 12px;
+          width: 40px;
+          height: 40px;
+          background-color: ${colors.main};
+          margin: 0;
+          padding: 0;
+          border: none;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        `}
+        onClick={async () => {
+          const response = await axios.get(
+            "http://localhost:3000/api/generate-google-oauth-url"
+          );
+          const { authorizeUrl } = response.data;
+          console.log("response", response);
+
+          // Google認証ページを別タブで開く
+          window.open(authorizeUrl, "_blank");
+        }}
+      >
+        <GoogleIcon
+          fill={colors.white}
+          css={css`
+            width: 20px;
+            height: 20px;
+          `}
+        />
+      </button>
+      <div>
+        <StepTitle title="自分の名前を入力" step={1} />
+        <input
+          value={memberName}
+          onChange={(e) => setMemberName(e.currentTarget.value)}
+        />
+      </div>
+
+      <StepTitle title="候補から参加できる日時を選択" step={2} />
+      <div
+        css={css`
+          display: flex;
+          align-items: center;
+        `}
+      >
+        {googleCalendarList.map((googleCalendar) => (
+          <div
+            key={googleCalendar.name}
+            css={css`
+              display: flex;
+              align-items: center;
+            `}
+          >
+            <div
+              css={css`
+                background-color: ${googleCalendar.color};
+                width: 20px;
+                height: 20px;
+                border-radius: 8px;
+              `}
+            />
+            <p>{googleCalendar.name}</p>
+          </div>
+        ))}
+      </div>
+      <FullCalendar
+        visibleRange={{
+          start: new Date(),
+        }}
+        showNonCurrentDates={true}
+        ref={calendarRef}
+        plugins={[timegridPlugin, listPlugin, googleCalendarPlugin]}
+        events={eventData}
+        headerToolbar={{
+          right: "timeGridWeek,listYear,today,prev,next",
+        }}
+        height={"100%"}
+        eventColor={colors.accent}
+        googleCalendarApiKey={process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY}
+        eventMinHeight={60}
+        selectable={true}
+        eventClick={handleEventSelect}
+        eventContent={(contentInfo) => {
+          if (contentInfo.event.title)
+            return <div>{contentInfo.event.title}</div>;
+          else if (
+            selectedEvents.some((_) => _.event.id === contentInfo.event.id) &&
+            selectedEvents.find((_) => _.event.id === contentInfo.event.id)
+              ?.isSelected
+          )
+            return (
+              <div>
+                <CheckIcon
+                  fill={colors.white}
+                  css={css`
+                    width: 20px;
+                    height: 20px;
+                  `}
+                />
+              </div>
+            );
+          else return <></>;
+        }}
       />
       <button
+        css={css`
+          width: 100%;
+          background-color: ${colors.accent};
+          border-radius: 20px;
+          margin: 8px 32px;
+          max-width: 300px;
+          padding: 12px 8px;
+          border: none;
+          align-self: center;
+          color: ${colors.white};
+          font-weight: bold;
+        `}
         onClick={() => {
-          const calendarApi = calendarRef.current.getApi();
-          let joinMember = calendarData?.joinMember;
+          let joinMember = { ...calendarData?.joinMember };
           if (joinMember) {
             if (memberName) {
+              console.log("eventData is", selectedEvents);
               joinMember[memberId] = memberName;
-              uploadCalendar({
+              updateCalendarJoinMember({
                 id,
-                calendarApi,
-                joinMember,
-              });
-              router.replace(`/calendar/${id}`);
+                eventData: selectedEvents,
+                memberId,
+                memberName,
+              })
+                .then(() => {
+                  saveCalendarList({
+                    id,
+                    name: calendarData.name,
+                  });
+                  router.replace(`/calendar/${id}`);
+                })
+                .catch((error) => {
+                  showError({
+                    title: error.title,
+                    message: error.message,
+                  });
+                });
             } else {
               alert("名前を入力してください");
             }
@@ -79,38 +293,6 @@ const calendarPage: NextPage = () => {
       >
         OK
       </button>
-      <p>{memberId}</p>
-      <p>{id}</p>
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[timegridPlugin, listPlugin]}
-        events={calendarData?.events}
-        headerToolbar={{
-          right: "timeGridWeek,listYear",
-        }}
-        eventMinHeight={60}
-        selectable={true}
-        eventClick={handleEventSelect}
-        eventContent={(contentInfo) => {
-          console.log("content is", contentInfo.event.extendedProps.joinMember);
-          return (
-            <div>
-              <div>
-                {(contentInfo.event.extendedProps.joinMember as string[]).find(
-                  (member) => member === memberId
-                )
-                  ? "✔"
-                  : "✘"}
-              </div>
-              {contentInfo.event.extendedProps.joinMember.map(
-                (name: string, index: number) => (
-                  <p key={index}>{name}</p>
-                )
-              )}
-            </div>
-          );
-        }}
-      />
     </div>
   );
 };

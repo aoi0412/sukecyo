@@ -6,12 +6,18 @@ export type calendar = {
   URL: string;
   events: event[];
   joinMember: calendarMember;
+  confirmedEvent: null | event;
 };
 export type event = {
   id: string;
   end: string;
   joinMember: string[];
   start: string;
+};
+
+export type eventForJoin = {
+  isSelected: boolean;
+  event: event;
 };
 
 export type calendarMember = { [memberId: string]: string };
