@@ -224,14 +224,16 @@ const createCalendar = () => {
           font-weight: bold;
         `}
         onClick={() => {
-          if (calendarName !== "") {
-            const calendarApi = calendarRef.current.getApi();
+          const calendarApi = calendarRef.current.getApi();
+          if (calendarName === "") {
+            alert("イベント名を入力してください");
+          } else if (calendarApi.getEvents().length === 0) {
+            alert("日程を1つ以上選択してください");
+          } else {
             console.log("events is", calendarApi.getEvents());
             uploadCalendar({ calendarApi, calendarName, id });
             saveCalendarList({ id: id, name: calendarName });
             router.replace(`calendar/${id}`);
-          } else {
-            alert("イベント名を入力してください");
           }
         }}
       >
