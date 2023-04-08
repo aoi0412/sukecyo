@@ -50,6 +50,23 @@ const calendarPage: NextPage = () => {
   const [eventData, setEventData] = useRecoilState(currentEventsAtom);
   const [shareComfirmEvent, setShareConfirmEvent] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const getShareText = (docData: calendar) => {
+    return docData.confirmedEvent
+      ? `${docData.name}の日程が確定しました！\n ${
+          docData.confirmedEvent.start
+        }~${
+          docData.confirmedEvent.end
+        }\n カレンダーへの追加はこちらのURLから行ってください \n ${createGoogleCalendarURL(
+          {
+            title: docData.name,
+            details: "details",
+            start: docData.confirmedEvent.start,
+            end: docData.confirmedEvent.end,
+          }
+        )}`
+      : "";
+  };
   useEffect(() => {
     if (typeof id === "string") {
       const db = getFirestore(firebaseApp);
@@ -59,19 +76,7 @@ const calendarPage: NextPage = () => {
           const docData = doc.data() as calendar;
           setCalendarData(docData);
           if (docData.confirmedEvent) {
-            const tmpShareText = `${docData.name}の日程が確定しました！\n ${
-              docData.confirmedEvent.start
-            }~${
-              docData.confirmedEvent.end
-            }\n カレンダーへの追加はこちらのURLから行ってください \n ${createGoogleCalendarURL(
-              {
-                title: docData.name,
-                details: "details",
-                start: docData.confirmedEvent.start,
-                end: docData.confirmedEvent.end,
-              }
-            )}`;
-            setShareConfirmEvent(tmpShareText);
+            setShareConfirmEvent(getShareText(docData));
           }
           const colRef = collection(db, "calendar", id, "events");
           getDocs(colRef)
@@ -441,6 +446,8 @@ const calendarPage: NextPage = () => {
                           let tmpCalendarData: calendar = { ...calendarData };
                           tmpCalendarData.confirmedEvent = event;
                           setCalendarData(tmpCalendarData);
+                          console.log("fjeawiofpjawo");
+                          setShareConfirmEvent(getShareText(tmpCalendarData));
                         }
                       }}
                       key={event.id}
