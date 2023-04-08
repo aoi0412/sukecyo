@@ -12,20 +12,13 @@ export const saveCalendarList = ({
     let calendarList: calendarList = JSON.parse(calendarListJson);
     if (calendarList.length === 0) {
       calendarList = [];
+    } else {
+      if (!calendarList.some((_) => _.id === id)) {
+        calendarList.push({ id: id, name: name });
+      }
     }
-    console.log(
-      !calendarList.some((_) => _.id === id),
-      ":",
-      calendarList,
-      ":",
-      id
-    );
-    if (!calendarList.some((_) => _.id === id)) {
-      calendarList.push({ id: id, name: name });
-      localStorage.setItem("calendarList", JSON.stringify(calendarList));
-    }
-    calendarList.push({ id: id, name: name });
     localStorage.setItem("calendarList", JSON.stringify(calendarList));
+
     return calendarList;
   } else {
     localStorage.setItem(
