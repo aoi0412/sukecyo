@@ -28,6 +28,7 @@ export default function Callback() {
           accessToken: tokens.access_token,
         })
         .then((res) => {
+          localStorage.setItem("googleCalendarData", "null");
           let tmpCalendarList: fetchedCalendar[] = [];
           if (Array.isArray(res.data.items) && res.data.items.length !== 0) {
             console.log(res.data.items);
@@ -42,50 +43,17 @@ export default function Callback() {
               });
             });
             console.log("datalist is", tmpCalendarList);
-            setCalendars(tmpCalendarList);
+            console.log("googlecalenar is", tmpCalendarList);
+            localStorage.setItem(
+              "googleCalendarData",
+              JSON.stringify(tmpCalendarList)
+            );
+            window.close();
           }
         });
     };
     fn().then();
   }, [router.query.code]);
 
-  return (
-    <div>
-      {calendars.map((calendar, index) => (
-        <div key={index}>
-          <input
-            type="checkbox"
-            value={calendar.title}
-            onClick={(e) => {
-              let tmpCalendars = [...selectedList];
-              if (tmpCalendars.find((_) => _.title === e.currentTarget.value)) {
-                console.log("a");
-                tmpCalendars = tmpCalendars.filter(
-                  (_) => _.title !== e.currentTarget.value
-                );
-              } else {
-                console.log("b");
-                tmpCalendars.push(calendar);
-              }
-              console.log("pushed", tmpCalendars, ",", e.currentTarget.value);
-              setSelectedList(tmpCalendars);
-            }}
-          />
-          <p>{calendar.title}</p>
-        </div>
-      ))}
-      <button
-        onClick={() => {
-          console.log("googlecalenar is", selectedList);
-          localStorage.setItem(
-            "googleCalendarData",
-            JSON.stringify(selectedList)
-          );
-          window.close();
-        }}
-      >
-        OK
-      </button>
-    </div>
-  );
+  return <div>Loading...</div>;
 }

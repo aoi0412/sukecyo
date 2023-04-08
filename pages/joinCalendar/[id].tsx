@@ -224,9 +224,18 @@ const calendarPage: NextPage = () => {
         selectable={true}
         eventClick={handleEventSelect}
         eventContent={(contentInfo) => {
-          if (contentInfo.event.title)
-            return <div>{contentInfo.event.title}</div>;
-          else if (
+          if (contentInfo.event.title) {
+            console.log(googleCalendarList, ":", contentInfo);
+            return (
+              <div>
+                {
+                  googleCalendarList.find(
+                    (_) => _.color === contentInfo.backgroundColor
+                  )?.name
+                }
+              </div>
+            );
+          } else if (
             selectedEvents.some((_) => _.event.id === contentInfo.event.id) &&
             selectedEvents.find((_) => _.event.id === contentInfo.event.id)
               ?.isSelected
