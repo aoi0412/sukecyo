@@ -51,6 +51,10 @@ export const deleteCalendarList = (id: string): calendarList => {
   }
 };
 
+export const deleteAllCalendarList = () => {
+  localStorage.clear();
+};
+
 export const getCalendarList = async (): Promise<calendarList> => {
   const calendarListJson = localStorage.getItem("calendarList");
   if (calendarListJson) {

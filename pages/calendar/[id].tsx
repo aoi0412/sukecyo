@@ -381,10 +381,17 @@ const calendarPage: NextPage = () => {
                   </p>
                   {calendarData &&
                     Object.entries(calendarData.joinMember).map(
-                      ([id, name]) => {
+                      ([memberId, memberName]) => {
                         return (
-                          <div
-                            key={id}
+                          <Link
+                            href={{
+                              pathname: `/joinCalendar/${id}`,
+                              query: {
+                                memberId,
+                                memberName,
+                              },
+                            }}
+                            key={memberId}
                             css={css`
                               height: 40px;
                             `}
@@ -403,9 +410,9 @@ const calendarPage: NextPage = () => {
                                 text-align: center;
                               `}
                             >
-                              {name}
+                              {memberName}
                             </p>
-                          </div>
+                          </Link>
                         );
                       }
                     )}

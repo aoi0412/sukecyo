@@ -19,7 +19,7 @@ import { css } from "@emotion/react";
 import CheckIcon from "../../public/check.svg";
 import { google } from "googleapis";
 import GoogleIcon from "../../public/google.svg";
-import { event } from "../../types/calendar";
+import { event, eventForJoin } from "../../types/calendar";
 
 const calendarPage: NextPage = () => {
   const router = useRouter();
@@ -30,7 +30,7 @@ const calendarPage: NextPage = () => {
 
   const [calendarData, setCalendarData] = useRecoilState(currentCalendarAtom);
   const [eventData, setEventData] = useRecoilState(currentEventsAtom);
-  const [selectedEvents, setSelectesEvents] = useState<event[]>([]);
+  const [selectedEvents, setSelectesEvents] = useState<eventForJoin[]>([]);
   const [memberName, setMemberName] = useState<string>("");
   const [googleCalendarList, setGoogleCalendarList] = useState<
     {
@@ -42,16 +42,20 @@ const calendarPage: NextPage = () => {
     console.log("selectionInfo: ", selectionInfo); // 選択した範囲の情報をconsoleに出力
     let tmpEventData = [...selectedEvents];
     const event = selectionInfo.event;
-    if (tmpEventData.some((_) => _.id === event.id)) {
-      tmpEventData = tmpEventData.filter((_) => _.id !== event.id);
+    if (tmpEventData.some((_) => _.event.id === event.id)) {
+      const index = tmpEventData.findIndex((_) => _.event.id === event.id);
+      tmpEventData[index].isSelected = false;
     } else {
       let tmpJoinMember = [...event.extendedProps.joinMember];
       tmpJoinMember.push(memberId);
       tmpEventData.push({
-        id: event.id,
-        end: event.endStr,
-        start: event.startStr,
-        joinMember: tmpJoinMember,
+        isSelected: true,
+        event: {
+          id: event.id,
+          end: event.endStr,
+          start: event.startStr,
+          joinMember: tmpJoinMember,
+        },
       });
     }
     setSelectesEvents(tmpEventData);
@@ -59,6 +63,40 @@ const calendarPage: NextPage = () => {
   const calendarRef = useRef<FullCalendar>(null!);
 
   useEffect(() => {
+    if (
+      typeof router.query.memberId === "string" &&
+      typeof router.query.memberName === "string"
+    ) {
+      setMemberId(router.query.memberId);
+      setMemberName(router.query.memberName);
+      const calenadrApi = calendarRef.current.getApi();
+      let tmpSelectedList: eventForJoin[] = [];
+      calenadrApi.getEvents().forEach((event) => {
+        const joinMember: string[] = event.extendedProps.joinMember;
+
+        if (joinMember.some((_) => _ === router.query.memberId)) {
+          console.log(
+            "event data is",
+            event,
+            ",is member",
+            joinMember,
+            "id is",
+            router.query.memberId
+          );
+          tmpSelectedList.push({
+            isSelected: true,
+            event: {
+              id: event.id,
+              end: event.endStr,
+              start: event.startStr,
+              joinMember: event.extendedProps.joinMember,
+            },
+          });
+        }
+      });
+      console.log("selected is", tmpSelectedList);
+      setSelectesEvents(tmpSelectedList);
+    }
     if (calendarRef.current) {
       window.onstorage = (event) => {
         if (event.key != "googleCalendarData") return;
@@ -188,7 +226,11 @@ const calendarPage: NextPage = () => {
         eventContent={(contentInfo) => {
           if (contentInfo.event.title)
             return <div>{contentInfo.event.title}</div>;
-          else if (selectedEvents.some((_) => _.id === contentInfo.event.id))
+          else if (
+            selectedEvents.some((_) => _.event.id === contentInfo.event.id) &&
+            selectedEvents.find((_) => _.event.id === contentInfo.event.id)
+              ?.isSelected
+          )
             return (
               <div>
                 <CheckIcon

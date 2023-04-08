@@ -1,5 +1,6 @@
 import { CalendarApi } from "@fullcalendar/core";
 import {
+  arrayRemove,
   arrayUnion,
   doc,
   getFirestore,
@@ -7,11 +8,11 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { firebaseApp } from "../firebase";
-import { event } from "../types/calendar";
+import { event, eventForJoin } from "../types/calendar";
 import { showError } from "./error";
 
 type updateCalendarJoinMemberProp = {
-  eventData: event[];
+  eventData: eventForJoin[];
   id: string;
   memberName: string;
   memberId: string;
@@ -56,7 +57,7 @@ export const updateEventMemberList = async ({
   memberId,
   eventData,
 }: {
-  eventData: event[];
+  eventData: eventForJoin[];
   id: string;
   memberId: string;
 }) => {
@@ -65,11 +66,17 @@ export const updateEventMemberList = async ({
 
   eventData.forEach((event) => {
     console.log("eventsssssss", event);
-    const docRef = doc(db, "calendar", id, "events", event.id);
+    const docRef = doc(db, "calendar", id, "events", event.event.id);
     console.log("event change", event);
-    batch.update(docRef, {
-      joinMember: arrayUnion(memberId),
-    });
+    if (event.isSelected) {
+      batch.update(docRef, {
+        joinMember: arrayUnion(memberId),
+      });
+    } else {
+      batch.update(docRef, {
+        joinMember: arrayRemove(memberId),
+      });
+    }
   });
   return await batch.commit();
 };

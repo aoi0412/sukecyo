@@ -4,7 +4,10 @@ import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCalendarListData } from "../functions/calendarList";
-import { getCalendarList } from "../functions/localStorage";
+import {
+  deleteAllCalendarList,
+  getCalendarList,
+} from "../functions/localStorage";
 
 import { calendar } from "../types/calendar";
 import { css } from "@emotion/react";
@@ -70,26 +73,49 @@ const Home: NextPage = () => {
           `}
         >
           {isEditable ? (
-            <button
-              onClick={() => setIsEditable(false)}
-              css={css`
-                width: 40px;
-                height: 40px;
-                background-color: ${colors.main};
-                margin: 0;
-                padding: 0;
-                border: none;
-                border-radius: 8px;
-              `}
-            >
-              <CloseIcon
-                fill={colors.white}
+            <>
+              <button
+                onClick={() => setIsEditable(false)}
                 css={css`
-                  width: 16px;
-                  height: 16px;
+                  width: 40px;
+                  height: 40px;
+                  background-color: ${colors.main};
+                  margin: 0;
+                  padding: 0;
+                  border: none;
+                  border-radius: 8px;
                 `}
-              />
-            </button>
+              >
+                <CloseIcon
+                  fill={colors.white}
+                  css={css`
+                    width: 16px;
+                    height: 16px;
+                  `}
+                />
+              </button>
+              <button
+                onClick={() => deleteAllCalendarList()}
+                css={css`
+                  width: 40px;
+                  height: 40px;
+                  background-color: ${colors.main};
+                  margin: 0;
+                  padding: 0;
+                  border: none;
+                  border-radius: 8px;
+                `}
+              >
+                <p>deleteAll</p>
+                <CloseIcon
+                  fill={colors.white}
+                  css={css`
+                    width: 16px;
+                    height: 16px;
+                  `}
+                />
+              </button>
+            </>
           ) : (
             <button
               onClick={() => setIsEditable(true)}

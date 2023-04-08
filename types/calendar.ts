@@ -15,4 +15,9 @@ export type event = {
   start: string;
 };
 
+export type eventForJoin = {
+  isSelected: boolean;
+  event: event;
+};
+
 export type calendarMember = { [memberId: string]: string };
