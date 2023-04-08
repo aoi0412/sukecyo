@@ -10,15 +10,16 @@ export const getCalendarListData = async (
   const db = getFirestore(firebaseApp);
   return runTransaction(db, async (transaction) => {
     let tmpCalendarList: calendar[] = [];
-    await calendarList.forEach(async (calendar) => {
+    await calendarList.forEach((calendar) => {
       const docRef = doc(db, "calendar", calendar.id);
-      await transaction.get(docRef).then((document) => {
+      transaction.get(docRef).then((document) => {
         const data = document.data();
         if (isCalendar(data)) {
           tmpCalendarList.push(data);
         }
       });
     });
+    console.log("return");
     return tmpCalendarList;
   });
 };

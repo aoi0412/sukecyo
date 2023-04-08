@@ -8,14 +8,12 @@ export const saveCalendarList = ({
   name: string;
 }): calendarList => {
   const calendarListJson = localStorage.getItem("calendarList");
+  console.log("Json is", calendarListJson, ",created is", id, ":", name);
   if (calendarListJson) {
     let calendarList: calendarList = JSON.parse(calendarListJson);
-    if (calendarList.length === 0) {
-      calendarList = [];
-    } else {
-      if (!calendarList.some((_) => _.id === id)) {
-        calendarList.push({ id: id, name: name });
-      }
+
+    if (!calendarList.some((_) => _.id === id)) {
+      calendarList.push({ id: id, name: name });
     }
     localStorage.setItem("calendarList", JSON.stringify(calendarList));
 
