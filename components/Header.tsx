@@ -1,27 +1,27 @@
 import Link from "next/link";
 import { css } from "@emotion/react";
 import { colors } from "../styles/colors";
+import Logo from "../public/長方形.png";
+import Image from "next/image";
 
 const Header = () => {
   return (
     <div
       css={css`
-        height: 60px;
+        height: 80px;
         background-color: ${colors.accent};
         width: 100vw;
         display: flex;
         align-items: center;
-        padding: 12px;
       `}
     >
       <Link
         css={css`
-          background-color: ${colors.dark};
           height: 100%;
         `}
         href="/"
       >
-        Home
+        <Image src="/長方形.png" width={633 / 4} height={80} alt={""} />
       </Link>
     </div>
   );
