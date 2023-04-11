@@ -247,7 +247,12 @@ const calendarPage: NextPage = () => {
           `}
         >
           <p>URL</p>
-          <input value={calendarData?.URL} />
+          <input
+            css={css`
+              font-size: 16px;
+            `}
+            value={calendarData?.URL}
+          />
           <button
             onClick={() => {
               if (calendarData)
