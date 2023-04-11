@@ -175,6 +175,9 @@ const calendarPage: NextPage = () => {
         <StepTitle title="自分の名前を入力" step={1} />
         <input
           value={memberName}
+          css={css`
+            font-size: 16px;
+          `}
           onChange={(e) => setMemberName(e.currentTarget.value)}
         />
       </div>

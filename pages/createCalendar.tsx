@@ -146,6 +146,7 @@ const createCalendar = () => {
               margin: 0;
               color: ${colors.dark};
               border-bottom: 2px solid ${colors.dark};
+              font-size: 16px;
               ::placeholder {
                 color: ${colors.dark};
               }
@@ -160,6 +161,7 @@ const createCalendar = () => {
               width: 100px;
               border: none;
               color: ${colors.dark};
+              font-size: 16px;
               border-bottom: 2px solid ${colors.dark};
             `}
             type="number"
