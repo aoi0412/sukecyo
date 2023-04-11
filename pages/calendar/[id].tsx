@@ -41,6 +41,7 @@ import CloseIcon from "../../public/cross.svg";
 import Modal from "react-modal";
 import CheckIcon from "../../public/check.svg";
 import CopyIcon from "../../public/copy-alt.svg";
+import { baseURL } from "../../baseURL";
 
 const calendarPage: NextPage = () => {
   const WeekChars = ["日", "月", "火", "水", "木", "金", "土"];
@@ -425,6 +426,7 @@ const calendarPage: NextPage = () => {
                 {eventData.map((event, index) => {
                   const start = new Date(event.start);
                   const end = new Date(event.end);
+                  console.log(start.getTime() > end.getTime() ? -1 : 1);
                   const formatDate = `${start.getMonth()}/${start.getDate()}(${
                     WeekChars[start.getDay()]
                   })`;
@@ -443,7 +445,9 @@ const calendarPage: NextPage = () => {
                         if (typeof id === "string")
                           confirmEvents({ event, id });
                         if (calendarData) {
-                          let tmpCalendarData: calendar = { ...calendarData };
+                          let tmpCalendarData: calendar = {
+                            ...calendarData,
+                          };
                           tmpCalendarData.confirmedEvent = event;
                           setCalendarData(tmpCalendarData);
                           console.log("fjeawiofpjawo");
@@ -574,7 +578,7 @@ const calendarPage: NextPage = () => {
             font-weight: bold;
             text-align: center;
           `}
-          href={`http://localhost:3000/joinCalendar/${id}`}
+          href={`${baseURL}/joinCalendar/${id}`}
         >
           自分の予定を入力する
         </Link>

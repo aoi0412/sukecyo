@@ -94,27 +94,6 @@ const Home: NextPage = () => {
                   `}
                 />
               </button>
-              <button
-                onClick={() => deleteAllCalendarList()}
-                css={css`
-                  width: 40px;
-                  height: 40px;
-                  background-color: ${colors.main};
-                  margin: 0;
-                  padding: 0;
-                  border: none;
-                  border-radius: 8px;
-                `}
-              >
-                <p>deleteAll</p>
-                <CloseIcon
-                  fill={colors.white}
-                  css={css`
-                    width: 16px;
-                    height: 16px;
-                  `}
-                />
-              </button>
             </>
           ) : (
             <button
