@@ -207,6 +207,7 @@ const calendarPage: NextPage = () => {
         ))}
       </div>
       <FullCalendar
+        scrollTime={null}
         visibleRange={{
           start: new Date(),
         }}
