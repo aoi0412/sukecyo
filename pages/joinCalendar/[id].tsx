@@ -20,6 +20,7 @@ import CheckIcon from "../../public/check.svg";
 import { google } from "googleapis";
 import GoogleIcon from "../../public/google.svg";
 import { event, eventForJoin } from "../../types/calendar";
+import { baseURL } from "../../baseURL";
 
 const calendarPage: NextPage = () => {
   const router = useRouter();
@@ -154,7 +155,7 @@ const calendarPage: NextPage = () => {
         `}
         onClick={async () => {
           const response = await axios.get(
-            "http://localhost:3000/api/generate-google-oauth-url"
+            `${baseURL}/api/generate-google-oauth-url`
           );
           const { authorizeUrl } = response.data;
           console.log("response", response);
