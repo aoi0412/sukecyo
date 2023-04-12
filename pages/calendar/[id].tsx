@@ -129,9 +129,12 @@ const calendarPage: NextPage = () => {
         />
         <button
           onClick={() => {
-            if (calendarData)
+            if (calendarData) {
               global.navigator.clipboard.writeText(shareComfirmEvent);
-            alert("コピーしました！");
+              alert("コピーしました！");
+            } else {
+              alert("コピーに失敗しました");
+            }
           }}
           css={css`
             padding: 8px;
@@ -255,9 +258,12 @@ const calendarPage: NextPage = () => {
           />
           <button
             onClick={() => {
-              if (calendarData)
+              if (calendarData) {
                 global.navigator.clipboard.writeText(calendarData.URL);
-              alert("コピーしました！");
+                alert("コピーしました！");
+              } else {
+                alert("コピーに失敗しました");
+              }
             }}
             css={css`
               position: absolute;
