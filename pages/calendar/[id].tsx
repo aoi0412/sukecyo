@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+// 僕はウンチ太郎デス。
 import FullCalendar from "@fullcalendar/react";
 import {
   collection,
@@ -44,7 +45,7 @@ import CopyIcon from "../../public/copy-alt.svg";
 import { baseURL } from "../../baseURL";
 
 const calendarPage: NextPage = () => {
-  const WeekChars = ["日", "月", "火", "水", "木", "金", "土"];
+  const untiChars = ["日", "月", "火", "水", "木", "金", "土"];
   const router = useRouter();
   const id = router.query.id;
   const [calendarData, setCalendarData] = useRecoilState(currentCalendarAtom);
@@ -129,9 +130,12 @@ const calendarPage: NextPage = () => {
         />
         <button
           onClick={() => {
-            if (calendarData)
+            if (calendarData) {
               global.navigator.clipboard.writeText(shareComfirmEvent);
-            alert("コピーしました！");
+              alert("コピーしました！");
+            } else {
+              alert("コピーに失敗しました");
+            }
           }}
           css={css`
             padding: 8px;
@@ -255,9 +259,12 @@ const calendarPage: NextPage = () => {
           />
           <button
             onClick={() => {
-              if (calendarData)
+              if (calendarData) {
                 global.navigator.clipboard.writeText(calendarData.URL);
-              alert("コピーしました！");
+                alert("コピーしました！");
+              } else {
+                alert("コピーに失敗しました");
+              }
             }}
             css={css`
               position: absolute;
@@ -433,7 +440,7 @@ const calendarPage: NextPage = () => {
                   const end = new Date(event.end);
                   console.log(start.getTime() > end.getTime() ? -1 : 1);
                   const formatDate = `${start.getMonth()}/${start.getDate()}(${
-                    WeekChars[start.getDay()]
+                    untiChars[start.getDay()]
                   })`;
                   const formatTime = `${start.getHours()}:${
                     start.getMinutes() < 10

@@ -225,7 +225,6 @@ const calendarPage: NextPage = () => {
         height={"100%"}
         eventColor={colors.accent}
         googleCalendarApiKey={process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY}
-        eventMinHeight={60}
         selectable={true}
         eventClick={handleEventSelect}
         eventContent={(contentInfo) => {
