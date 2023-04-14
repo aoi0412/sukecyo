@@ -53,6 +53,9 @@ export default function Callback() {
             console.log("Error:something failed");
             window.close();
           }
+        })
+        .catch((error) => {
+          console.log("Error", error);
         });
     };
   }, [router.query.code]);
