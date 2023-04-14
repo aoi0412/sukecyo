@@ -49,10 +49,12 @@ export default function Callback() {
               JSON.stringify(tmpCalendarList)
             );
             window.close();
+          } else {
+            console.log("Error:something failed");
+            window.close();
           }
         });
     };
-    fn().then();
   }, [router.query.code]);
 
   return <div>Loading...</div>;
