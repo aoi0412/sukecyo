@@ -39,6 +39,7 @@ export const updateCalendarJoinMember = async ({
         showError({
           title: error.title,
           message: error.message,
+          location: "updateCalendar.ts;42",
         });
       });
     })
@@ -46,6 +47,7 @@ export const updateCalendarJoinMember = async ({
       showError({
         title: error.title,
         message: error.message,
+        location: "updateCalendar.ts;50",
       });
     });
   1;

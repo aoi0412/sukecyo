@@ -313,6 +313,7 @@ const calendarPage: NextPage = () => {
                   showError({
                     title: error.title,
                     message: error.message,
+                    location: "join [id].tsx;316",
                   });
                 });
             } else {
