@@ -31,7 +31,7 @@ const calendarPage: NextPage = () => {
 
   const [calendarData, setCalendarData] = useRecoilState(currentCalendarAtom);
   const [eventData, setEventData] = useRecoilState(currentEventsAtom);
-  const [selectedEvents, setSelectesEvents] = useState<eventForJoin[]>([]);
+  const [selectedEvents, setSelectedEvents] = useState<eventForJoin[]>([]);
   const [memberName, setMemberName] = useState<string>("");
   const [googleCalendarList, setGoogleCalendarList] = useState<
     {
@@ -45,7 +45,11 @@ const calendarPage: NextPage = () => {
     const event = selectionInfo.event;
     if (tmpEventData.some((_) => _.event.id === event.id)) {
       const index = tmpEventData.findIndex((_) => _.event.id === event.id);
-      tmpEventData[index].isSelected = false;
+      if (tmpEventData[index].isSelected) {
+        tmpEventData[index].isSelected = false;
+      } else {
+        tmpEventData[index].isSelected = true;
+      }
     } else {
       let tmpJoinMember = [...event.extendedProps.joinMember];
       tmpJoinMember.push(memberId);
@@ -59,7 +63,7 @@ const calendarPage: NextPage = () => {
         },
       });
     }
-    setSelectesEvents(tmpEventData);
+    setSelectedEvents(tmpEventData);
   };
   const calendarRef = useRef<FullCalendar>(null!);
 
@@ -96,7 +100,7 @@ const calendarPage: NextPage = () => {
         }
       });
       console.log("selected is", tmpSelectedList);
-      setSelectesEvents(tmpSelectedList);
+      setSelectedEvents(tmpSelectedList);
     }
     if (calendarRef.current) {
       window.onstorage = (event) => {
@@ -244,19 +248,33 @@ const calendarPage: NextPage = () => {
             selectedEvents.some((_) => _.event.id === contentInfo.event.id) &&
             selectedEvents.find((_) => _.event.id === contentInfo.event.id)
               ?.isSelected
-          )
+          ) {
             return (
-              <div>
+              <div
+                css={css`
+                  max-height: 24px;
+                  max-width: 24px;
+                  height: 100%;
+                  aspect-ratio: 1;
+                  border-radius: 100%;
+                  background-color: ${colors.dark};
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                `}
+              >
                 <CheckIcon
                   fill={colors.white}
                   css={css`
-                    width: 20px;
-                    height: 20px;
+                    width: 100%;
+                    max-width: 12px;
+                    max-height: 12px;
+                    height: 100%;
                   `}
                 />
               </div>
             );
-          else return <></>;
+          } else return <></>;
         }}
       />
       <button
