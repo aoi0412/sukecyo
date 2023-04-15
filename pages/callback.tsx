@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { fetchedCalendar } from "../types/googleCalendar";
+import { baseURL } from "../baseURL";
 
 export default function Callback() {
   const [calendars, setCalendars] = useState<fetchedCalendar[]>([]);
@@ -10,10 +11,10 @@ export default function Callback() {
   const router = useRouter();
   useEffect(() => {
     const code = router.query.code;
-    console.log("run", code);
+    console.log("run", router);
     if (!code) return;
     axios
-      .post("http://localhost:3000/api/get-google-auth-token", {
+      .post(`${baseURL}/api/get-google-auth-token`, {
         authorizationCode: code,
       })
       .then((response) => {
@@ -21,7 +22,7 @@ export default function Callback() {
 
         // カレンダーの一覧を取得しstateに保存する
         axios
-          .post("http://localhost:3000/api/get-google-calendar", {
+          .post(`${baseURL}/api/get-google-calendar`, {
             accessToken: tokens.access_token,
           })
           .then((res) => {
@@ -53,7 +54,7 @@ export default function Callback() {
             console.log("Error", error);
           });
       });
-  }, []);
+  }, [router.query.code]);
 
   return <div>Loading...</div>;
 }
