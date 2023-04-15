@@ -56,6 +56,7 @@ export default function Callback() {
           console.log("Error", error);
         });
     };
+    fn().then();
   }, [router.query.code]);
 
   return <div>Loading...</div>;
