@@ -76,36 +76,40 @@ const calendarPage: NextPage = () => {
       getDoc(docRef)
         .then((doc) => {
           const docData = doc.data() as calendar;
-          setCalendarData(docData);
-          if (docData.confirmedEvent) {
-            setShareConfirmEvent(getShareText(docData));
+          if (docData) {
+            setCalendarData(docData);
+            if (docData.confirmedEvent) {
+              setShareConfirmEvent(getShareText(docData));
+            }
+            const colRef = collection(db, "calendar", id, "events");
+            getDocs(colRef)
+              .then((docs) => {
+                let tmpEvents: event[] = [];
+                docs.forEach((doc) => {
+                  const data = doc.data();
+                  if (isEvent(data)) {
+                    tmpEvents.push(data);
+                  }
+                });
+                tmpEvents.sort((a, b) => {
+                  return a.joinMember.length < b.joinMember.length ? 1 : -1;
+                });
+                setEventData(tmpEvents);
+              })
+              .catch((error) => {
+                showError({
+                  title: error.title,
+                  message: error.message,
+                  location: "calendar [id].tsx;103",
+                });
+              });
           }
-          const colRef = collection(db, "calendar", id, "events");
-          getDocs(colRef)
-            .then((docs) => {
-              let tmpEvents: event[] = [];
-              docs.forEach((doc) => {
-                const data = doc.data();
-                if (isEvent(data)) {
-                  tmpEvents.push(data);
-                }
-              });
-              tmpEvents.sort((a, b) => {
-                return a.joinMember.length < b.joinMember.length ? 1 : -1;
-              });
-              setEventData(tmpEvents);
-            })
-            .catch((error) => {
-              showError({
-                title: error.title,
-                message: error.message,
-              });
-            });
         })
         .catch((error) => {
           showError({
             title: error.title,
             message: error.message,
+            location: "calendar [id].tsx;112",
           });
         });
     }

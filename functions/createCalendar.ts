@@ -37,6 +37,7 @@ export const uploadCalendar = ({
       showError({
         title: error.title,
         message: error.message,
+        location: "createCalendar.ts;40",
       });
     });
 };
@@ -63,6 +64,7 @@ export const addEventList = ({ calendarApi, id }: uploadCalendarProp) => {
     showError({
       title: error.title,
       message: error.message,
+      location: "createCalendar.ts;67",
     });
   });
 };
