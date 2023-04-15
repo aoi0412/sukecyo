@@ -42,8 +42,6 @@ export default function Callback() {
                 title: calendarData.summary as string,
               });
             });
-            console.log("datalist is", tmpCalendarList);
-            console.log("googlecalenar is", tmpCalendarList);
             localStorage.setItem(
               "googleCalendarData",
               JSON.stringify(tmpCalendarList)
