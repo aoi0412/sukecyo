@@ -33,7 +33,7 @@ export default function Callback() {
               res.data.items.forEach((calendarData: any) => {
                 tmpCalendarList.push({
                   color: calendarData.backgroundColor,
-                  display: "background",
+                  display: "block",
                   googleCalendarId: calendarData.id,
                   googleCalendarApiKey: process.env
                     .NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY as string,
