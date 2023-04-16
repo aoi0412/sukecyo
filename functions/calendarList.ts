@@ -4,22 +4,23 @@ import { calendar } from "../types/calendar";
 import { calendarList } from "../types/localStorage";
 import { isCalendar } from "./typeCheck";
 
-export const getCalendarListData = async (
-  calendarList: calendarList
-): Promise<calendar[]> => {
+export const getCalendarListData = async (calendarList: calendarList) => {
+  let tmpCalendarList: calendar[] = [];
   const db = getFirestore(firebaseApp);
-  return runTransaction(db, async (transaction) => {
-    let tmpCalendarList: calendar[] = [];
-    await calendarList.forEach((calendar) => {
+  await runTransaction(db, async (transaction) => {
+    for (const calendar of calendarList) {
+      console.log("calendar is", calendar);
       const docRef = doc(db, "calendar", calendar.id);
-      transaction.get(docRef).then((document) => {
+      await transaction.get(docRef).then((document) => {
+        console.log("getDoc is", calendar);
         const data = document.data();
         if (isCalendar(data)) {
           tmpCalendarList.push(data);
         }
       });
-    });
-    console.log("return");
+    }
     return tmpCalendarList;
   });
+  console.log("Transaction successfully committed!");
+  return tmpCalendarList;
 };

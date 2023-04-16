@@ -26,8 +26,6 @@ const Home: NextPage = () => {
     getCalendarList().then((tmpCalendarList) => {
       console.log("get", tmpCalendarList);
       getCalendarListData(tmpCalendarList).then((calendarList) => {
-        console.log("calendarList is", calendarList);
-        console.log("length", calendarList.length);
         if (calendarList.length !== 0) setCalendarList(calendarList);
       });
     });
