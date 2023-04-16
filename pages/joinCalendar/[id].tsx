@@ -189,32 +189,6 @@ const calendarPage: NextPage = () => {
       </div>
 
       <StepTitle title="候補から参加できる日時を選択" step={2} />
-      <div
-        css={css`
-          display: flex;
-          align-items: center;
-        `}
-      >
-        {googleCalendarList.map((googleCalendar) => (
-          <div
-            key={googleCalendar.name}
-            css={css`
-              display: flex;
-              align-items: center;
-            `}
-          >
-            <div
-              css={css`
-                background-color: ${googleCalendar.color};
-                width: 20px;
-                height: 20px;
-                border-radius: 8px;
-              `}
-            />
-            <p>{googleCalendar.name}</p>
-          </div>
-        ))}
-      </div>
       <FullCalendar
         allDaySlot={false}
         scrollTime={null}
@@ -226,6 +200,7 @@ const calendarPage: NextPage = () => {
         plugins={[timegridPlugin, listPlugin, googleCalendarPlugin]}
         events={eventData}
         headerToolbar={{
+          left: undefined,
           right: "timeGridWeek,listYear,today,prev,next",
         }}
         height={"100%"}
