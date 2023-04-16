@@ -92,7 +92,10 @@ const calendarPage: NextPage = () => {
                   }
                 });
                 tmpEvents.sort((a, b) => {
-                  return a.joinMember.length < b.joinMember.length ? 1 : -1;
+                  return new Date(a.start).getTime() <
+                    new Date(b.start).getTime()
+                    ? -1
+                    : 1;
                 });
                 setEventData(tmpEvents);
               })
