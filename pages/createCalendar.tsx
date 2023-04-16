@@ -119,7 +119,7 @@ const createCalendar = () => {
         flex: 1;
         height: 100%;
         flex-direction: column;
-        padding: 20px;
+        /* padding: 20px; */
       `}
     >
       <div
@@ -179,14 +179,19 @@ const createCalendar = () => {
         `}
       >
         <StepTitle title="会議予定の候補を選択" step={2} />
-
         <FullCalendar
+          contentHeight={600}
+          allDaySlot={false}
           locale="ja"
           dayHeaderFormat={{
             weekday: "short",
             month: "numeric",
             day: "numeric",
             omitCommas: true,
+          }}
+          headerToolbar={{
+            right: "prev,next",
+            left: undefined,
           }}
           height={"100%"}
           expandRows={true}
@@ -200,7 +205,7 @@ const createCalendar = () => {
           eventClick={eventMouseClick}
           slotDuration="00:30:00"
           selectLongPressDelay={200}
-          eventLongPressDelay={1000}
+          eventLongPressDelay={500}
           eventAllow={(dateSpanApi) => {
             if (
               dateSpanApi.start.getTime() < getZeroTimeday(new Date()).getTime()
