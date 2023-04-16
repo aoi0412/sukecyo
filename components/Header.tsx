@@ -13,6 +13,10 @@ const Header = () => {
         width: 100vw;
         display: flex;
         align-items: center;
+        position: fixed;
+        top: 0;
+        z-index: 9999;
+        box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.3);
       `}
     >
       <Link

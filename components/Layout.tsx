@@ -13,6 +13,7 @@ const Layout: FC<Props> = ({ children }) => {
         width: 100vw;
         display: flex;
         flex-direction: column;
+        padding-top: 80px;
       `}
     >
       <Header />

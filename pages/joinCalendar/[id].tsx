@@ -216,6 +216,7 @@ const calendarPage: NextPage = () => {
         ))}
       </div>
       <FullCalendar
+        allDaySlot={false}
         scrollTime={null}
         visibleRange={{
           start: new Date(),
@@ -228,6 +229,7 @@ const calendarPage: NextPage = () => {
           right: "timeGridWeek,listYear,today,prev,next",
         }}
         height={"100%"}
+        initialView={window.innerWidth < 500 ? "listYear" : "timeGridWeek"}
         eventColor={colors.accent}
         googleCalendarApiKey={process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY}
         selectable={true}
