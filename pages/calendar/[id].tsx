@@ -45,7 +45,7 @@ import CopyIcon from "../../public/copy-alt.svg";
 import { baseURL } from "../../baseURL";
 
 const calendarPage: NextPage = () => {
-  const untiChars = ["日", "月", "火", "水", "木", "金", "土"];
+  const weekChars = ["日", "月", "火", "水", "木", "金", "土"];
   const router = useRouter();
   const id = router.query.id;
   const [calendarData, setCalendarData] = useRecoilState(currentCalendarAtom);
@@ -373,13 +373,14 @@ const calendarPage: NextPage = () => {
                 height: 100%;
                 border-radius: 12px;
                 padding: 12px;
-                overflow-x: scroll;
+                overflow-y: scroll;
               `}
             >
               <div
                 css={css`
                   display: flex;
-                  align-items: center;
+                  align-items: flex-start;
+                  flex-direction: column;
                   gap: 8px;
                 `}
               >
@@ -389,20 +390,18 @@ const calendarPage: NextPage = () => {
                     padding: 0;
                     height: 100%;
                     display: flex;
-                    flex-direction: column;
-                    gap: 4px;
+                    flex-direction: row;
+                    align-items: center;
                   `}
                 >
                   <p
                     css={css`
-                      height: 60px;
-                      padding: 4px 12px;
                       margin: 0;
-                      width: 100px;
+                      width: 80px;
                       text-align: center;
                     `}
                   >
-                    名前
+                    日程\名前
                   </p>
                   {calendarData &&
                     Object.entries(calendarData.joinMember).map(
@@ -424,6 +423,8 @@ const calendarPage: NextPage = () => {
                             <p
                               css={css`
                                 height: 40px;
+                                width: 44px;
+                                font-size: 8px;
                                 /* background-color: ${colors.done}; */
                                 margin: 0;
                                 padding: 0;
@@ -447,7 +448,7 @@ const calendarPage: NextPage = () => {
                   const end = new Date(event.end);
                   console.log(start.getTime() > end.getTime() ? -1 : 1);
                   const formatDate = `${start.getMonth()}/${start.getDate()}(${
-                    untiChars[start.getDay()]
+                    weekChars[start.getDay()]
                   })`;
                   const formatTime = `${start.getHours()}:${
                     start.getMinutes() < 10
@@ -460,35 +461,40 @@ const calendarPage: NextPage = () => {
                   }`;
                   return (
                     <div
-                      onClick={() => {
-                        if (typeof id === "string")
-                          confirmEvents({ event, id });
-                        if (calendarData) {
-                          let tmpCalendarData: calendar = {
-                            ...calendarData,
-                          };
-                          tmpCalendarData.confirmedEvent = event;
-                          setCalendarData(tmpCalendarData);
-                          console.log("fjeawiofpjawo");
-                          setShareConfirmEvent(getShareText(tmpCalendarData));
-                        }
-                      }}
                       key={event.id}
                       css={css`
                         display: flex;
-                        flex-direction: column;
+                        flex-direction: row;
                         align-items: center;
                         gap: 4px;
+                        padding: 4px;
+                        border-radius: 8px;
+                        background-color: #e4e4e4;
                       `}
                     >
                       <div
+                        onClick={() => {
+                          if (typeof id === "string")
+                            confirmEvents({ event, id });
+                          if (calendarData) {
+                            let tmpCalendarData: calendar = {
+                              ...calendarData,
+                            };
+                            tmpCalendarData.confirmedEvent = event;
+                            setCalendarData(tmpCalendarData);
+                            setShareConfirmEvent(getShareText(tmpCalendarData));
+                          }
+                        }}
                         css={css`
                           background-color: ${colors.accent};
-                          height: 60px;
-                          padding: 4px 12px;
+                          width: 76px;
+                          height: 40px;
+                          padding: 4px;
+                          line-height: 16px;
                           border-radius: 8px;
                           color: ${colors.white};
                           text-align: center;
+                          font-size: 12px;
                         `}
                       >
                         {formatDate}
@@ -565,37 +571,22 @@ const calendarPage: NextPage = () => {
               </div>
             </div>
           </div>
-          {/* <FullCalendar
-            scrollTime={"09:00:00"}
-            height={"100%"}
-            eventColor={colors.accent}
-            plugins={[timegridPlugin, listPlugin]}
-            events={eventData}
-            headerToolbar={{
-              right: "timeGridWeek,listYear,today,prev,next",
-            }}
-            eventContent={(contentInfo) => {
-              return (
-                <div>
-                  {contentInfo.event.extendedProps.joinMember.length}人参加
-                </div>
-              );
-            }}
-          /> */}
         </div>
         <Link
           css={css`
-            width: 100%;
             background-color: ${colors.accent};
             border-radius: 32px;
             margin: 20px;
-            max-width: 300px;
+            width: 200px;
             padding: 12px 8px;
             border: none;
             align-self: center;
             color: ${colors.white};
             font-weight: bold;
             text-align: center;
+            position: fixed;
+            bottom: 0px;
+            box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.3);
           `}
           href={`${baseURL}/joinCalendar/${id}`}
         >
