@@ -1,10 +1,10 @@
 import { css } from "@emotion/react";
-import { colors } from "../../styles/colors";
+import { colors } from "../../../../styles/colors";
 import { FC, HTMLProps } from "react";
 
 type Props = HTMLProps<HTMLButtonElement>;
 
-const IconButton: FC<Props> = ({ children, ...rest }) => {
+const BaseIconButton: FC<Props> = ({ children, ...rest }) => {
   return (
     <button
       {...rest}
@@ -24,4 +24,4 @@ const IconButton: FC<Props> = ({ children, ...rest }) => {
   );
 };
 
-export default IconButton;
+export default BaseIconButton;

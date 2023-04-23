@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import { colors } from "../../styles/colors";
+import { colors } from "../../../styles/colors";
 import { FC, HTMLProps } from "react";
 
 type Props = HTMLProps<HTMLParagraphElement>;

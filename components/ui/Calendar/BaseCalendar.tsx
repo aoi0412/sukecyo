@@ -1,6 +1,6 @@
 import FullCalendar from "@fullcalendar/react";
 import { CalendarOptions } from "@fullcalendar/core";
-import { colors } from "../../styles/colors";
+import { colors } from "../../../styles/colors";
 import { ClassAttributes, FC, MutableRefObject, forwardRef } from "react";
 
 type Props = CalendarOptions;

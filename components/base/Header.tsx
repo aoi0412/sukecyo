@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { css } from "@emotion/react";
-import { colors } from "../styles/colors";
+import { colors } from "../../styles/colors";
 import Logo from "../public/長方形.png";
 import Image from "next/image";
 

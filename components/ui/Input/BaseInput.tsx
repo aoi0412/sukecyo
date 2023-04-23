@@ -1,11 +1,11 @@
 import { css } from "@emotion/react";
 import { FC, HTMLProps } from "react";
-import { colors } from "../styles/colors";
+import { colors } from "../../../styles/colors";
 import { features } from "process";
 
 type Props = HTMLProps<HTMLInputElement>;
 
-const Input: FC<Props> = (props) => {
+const BaseInput: FC<Props> = (props) => {
   return (
     <input
       {...props}
@@ -26,4 +26,4 @@ const Input: FC<Props> = (props) => {
   );
 };
 
-export default Input;
+export default BaseInput;
