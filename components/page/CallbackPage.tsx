@@ -1,4 +1,4 @@
-import { baseURL } from "@/baseURL";
+import { baseURL } from "@/components/utils/baseURL";
 import { fetchedCalendar } from "@/types/googleCalendar";
 import axios from "axios";
 import { NextRouter, useRouter } from "next/router";

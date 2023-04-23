@@ -7,7 +7,7 @@ import {
   updateDoc,
   writeBatch,
 } from "firebase/firestore";
-import { firebaseApp } from "../firebase";
+import { firebaseApp } from "../components/utils/firebase";
 import { event, eventForJoin } from "../types/calendar";
 import { showError } from "./error";
 

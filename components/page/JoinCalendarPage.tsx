@@ -4,7 +4,7 @@ import { NextPage } from "next";
 import { NextRouter, useRouter } from "next/router";
 import { FC, useEffect, useRef, useState } from "react";
 import { EventClickArg } from "@fullcalendar/core";
-import { currentCalendarAtom, currentEventsAtom } from "../../recoil";
+import { currentCalendarAtom, currentEventsAtom } from "../utils/recoil";
 import { updateCalendarJoinMember } from "../../functions/updateCalendar";
 import { showError } from "../../functions/error";
 import { saveCalendarList } from "../../functions/localStorage";
@@ -13,7 +13,7 @@ import StepTitle from "../../components/ui/Title/StepTitle";
 import { css } from "@emotion/react";
 import CheckIcon from "../../public/check.svg";
 import { eventForJoin } from "../../types/calendar";
-import JoinCalendar from "../../components/Calendar/JoinCalendar";
+import JoinCalendar from "../../features/joinEvent/components/JoinCalendar";
 import { useRecoilState } from "recoil";
 import ConnectGoogleButton from "@/features/connectGoogleCalendar/components/ConnectGoogleButton";
 

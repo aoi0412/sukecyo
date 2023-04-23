@@ -13,8 +13,8 @@ import CloseIcon from "@/public/cross.svg";
 import EditIcon from "@/public/edit.svg";
 import BaseIconButton from "../ui/Button/IconButton/BaseIconButton";
 import SmallButton from "../ui/Button/SmallButton";
-import { baseURL } from "@/baseURL";
-import EventTile from "../EventTile";
+import { baseURL } from "@/components/utils/baseURL";
+import EventTile from "../../features/eventList/components/EventTile";
 
 const EventListPage: NextPage = () => {
   const [calendarList, setCalendarList] = useState<calendar[]>([]);

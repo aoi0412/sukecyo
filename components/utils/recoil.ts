@@ -1,6 +1,5 @@
 import { atom } from "recoil";
-import { calendar, event } from "./types/calendar";
-import { fetchedCalendar } from "./types/googleCalendar";
+import { calendar, event } from "../../types/calendar";
 
 export const currentCalendarAtom = atom<calendar | null>({
   key: "currentCalendarAtom",

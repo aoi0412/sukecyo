@@ -1,10 +1,10 @@
-import { calendar } from "../types/calendar";
+import { calendar } from "../../../types/calendar";
 import { FC } from "react";
 import { css } from "@emotion/react";
-import { colors } from "../styles/colors";
-import TrashIcon from "../public/trash.svg";
-import ArrowIcon from "../public/angle-right.svg";
-import { baseURL } from "../baseURL";
+import { colors } from "../../../styles/colors";
+import TrashIcon from "@/public/trash.svg";
+import ArrowIcon from "@/public/angle-right.svg";
+import { baseURL } from "../../../components/utils/baseURL";
 
 type Props = {
   calendar: calendar;
@@ -13,12 +13,7 @@ type Props = {
   onDelete: () => void;
 };
 
-const EventTile: FC<Props> = ({
-  calendar,
-  calendarList,
-  isEditable,
-  onDelete,
-}) => {
+const EventTile: FC<Props> = ({ calendar, isEditable, onDelete }) => {
   return (
     <div
       key={calendar.id}

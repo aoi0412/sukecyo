@@ -1,12 +1,11 @@
 import { css } from "@emotion/react";
 import { useState } from "react";
-import { colors } from "../../styles/colors";
-import StepTitle from "../ui/Title/StepTitle";
-import { currentCalendarAtom } from "../../recoil";
-import CopyIcon from "../../public/copy-alt.svg";
-import LinkIcon from "../../public/link.svg";
-import BaseModal from "../ui/Modal/BaseModal";
-import CopyIconButton from "../ui/Button/IconButton/CopyIconButton";
+import { colors } from "../../../styles/colors";
+import StepTitle from "../../../components/ui/Title/StepTitle";
+import { currentCalendarAtom } from "../../../components/utils/recoil";
+import LinkIcon from "@/public/link.svg";
+import BaseModal from "../../../components/ui/Modal/BaseModal";
+import CopyIconButton from "../../../components/ui/Button/IconButton/CopyIconButton";
 import { useRecoilValue } from "recoil";
 
 const ShareModal = () => {

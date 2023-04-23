@@ -1,5 +1,5 @@
 import { doc, getFirestore, runTransaction } from "firebase/firestore";
-import { firebaseApp } from "../firebase";
+import { firebaseApp } from "../components/utils/firebase";
 import { calendar } from "../types/calendar";
 import { calendarList } from "../types/localStorage";
 import { isCalendar } from "./typeCheck";

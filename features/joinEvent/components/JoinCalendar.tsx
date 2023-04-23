@@ -1,8 +1,8 @@
-import BaseCalendar from "../ui/Calendar/BaseCalendar";
+import BaseCalendar from "../../../components/ui/Calendar/BaseCalendar";
 import timegridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
-import { getZeroTimeday } from "../../functions/utils";
+import { getZeroTimeday } from "../../../functions/utils";
 import { CalendarOptions } from "@fullcalendar/core";
 import { forwardRef } from "react";
 import FullCalendar from "@fullcalendar/react";

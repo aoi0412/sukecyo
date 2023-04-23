@@ -7,7 +7,7 @@ import { getZeroTimeday } from "@/functions/utils";
 import { css } from "@emotion/react";
 import StepTitle from "../ui/Title/StepTitle";
 import BaseInput from "../ui/Input/BaseInput";
-import CreateCalendar from "../Calendar/CreateCalendar";
+import CreateCalendar from "../../features/createEvent/components/CreateCalendar";
 import LargeButton from "../ui/Button/LargeButton";
 import { uploadCalendar } from "@/functions/createCalendar";
 import { saveCalendarList } from "@/functions/localStorage";

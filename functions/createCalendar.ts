@@ -1,9 +1,9 @@
 import { CalendarApi } from "@fullcalendar/core";
 import { doc, getFirestore, setDoc, writeBatch } from "firebase/firestore";
-import { firebaseApp } from "../firebase";
+import { firebaseApp } from "../components/utils/firebase";
 import { calendar, calendarMember, event } from "../types/calendar";
 import { showError } from "./error";
-import { baseURL } from "../baseURL";
+import { baseURL } from "../components/utils/baseURL";
 
 type uploadCalendarProp = {
   calendarApi: CalendarApi;

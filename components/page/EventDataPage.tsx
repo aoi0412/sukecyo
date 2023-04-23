@@ -21,7 +21,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { firebaseApp } from "../../firebase";
+import { firebaseApp } from "../utils/firebase";
 import { calendar, event } from "../../types/calendar";
 import timegridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
@@ -33,7 +33,7 @@ import {
 import { isCalendar, isEvent } from "../../functions/typeCheck";
 import { showError } from "../../functions/error";
 import { useRecoilState } from "recoil";
-import { currentCalendarAtom, currentEventsAtom } from "../../recoil";
+import { currentCalendarAtom, currentEventsAtom } from "../utils/recoil";
 import { confirmEvents } from "../../functions/updateCalendar";
 import { colors } from "../../styles/colors";
 import { css } from "@emotion/react";
@@ -43,8 +43,8 @@ import CloseIcon from "../../public/cross.svg";
 import Modal from "react-modal";
 import CheckIcon from "../../public/check.svg";
 import CopyIcon from "../../public/copy-alt.svg";
-import { baseURL } from "../../baseURL";
-import ShareModal from "../../components/Modal/ShareModal";
+import { baseURL } from "../utils/baseURL";
+import ShareModal from "../../features/eventData/components/ShareModal";
 
 type Props = {
   router: NextRouter;

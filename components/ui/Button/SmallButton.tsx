@@ -1,7 +1,7 @@
 import { HTMLProps, FC } from "react";
 import { colors } from "../../../styles/colors";
 import { css } from "@emotion/react";
-import { baseURL } from "../../../baseURL";
+import { baseURL } from "../../utils/baseURL";
 
 type Props = HTMLProps<HTMLAnchorElement>;
 
