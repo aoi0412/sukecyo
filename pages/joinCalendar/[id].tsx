@@ -21,6 +21,8 @@ import { google } from "googleapis";
 import GoogleIcon from "../../public/google.svg";
 import { event, eventForJoin } from "../../types/calendar";
 import { baseURL } from "../../baseURL";
+import BaseCalendar from "../../components/Calendar/BaseCalendar";
+import JoinCalendar from "../../components/Calendar/JoinCalendar";
 
 const calendarPage: NextPage = () => {
   const router = useRouter();
@@ -189,26 +191,8 @@ const calendarPage: NextPage = () => {
       </div>
 
       <StepTitle title="候補から参加できる日時を選択" step={2} />
-      <FullCalendar
-        allDaySlot={false}
-        visibleRange={{
-          start: new Date(),
-        }}
-        ref={calendarRef}
-        locale="ja"
-        height={"100%"}
-        eventColor={colors.accent}
-        selectable={true}
-        scrollTime={null}
-        showNonCurrentDates={true}
-        plugins={[timegridPlugin, listPlugin, googleCalendarPlugin]}
+      <JoinCalendar
         events={eventData}
-        headerToolbar={{
-          left: undefined,
-          right: "timeGridWeek,listYear,today,prev,next",
-        }}
-        initialView={window.innerWidth < 500 ? "listYear" : "timeGridWeek"}
-        googleCalendarApiKey={process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY}
         eventClick={handleEventSelect}
         eventContent={(contentInfo) => {
           if (contentInfo.event.title) {
