@@ -1,9 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import FullCalendar from "@fullcalendar/react";
-import timegridPlugin from "@fullcalendar/timegrid";
-import listPlugin from "@fullcalendar/list";
 import { DateSelectArg, EventHoveringArg } from "@fullcalendar/core";
-import interactionPlugin from "@fullcalendar/interaction";
 import { useEffect, useRef, useState } from "react";
 import { uploadCalendar } from "../functions/createCalendar";
 import { saveCalendarList } from "../functions/localStorage";
@@ -11,7 +8,10 @@ import { useRouter } from "next/router";
 import { getZeroTimeday } from "../functions/utils";
 import { css } from "@emotion/react";
 import { colors } from "../styles/colors";
-import StepTitle from "../components/StepTitle";
+import StepTitle from "../components/Title/StepTitle";
+import CreateCalendar from "../components/Calendar/CreateCalendar";
+import LargeButton from "../components/Button/LargeButton";
+import Input from "../components/Input";
 const createCalendar = () => {
   const [calendarName, setCalendarName] = useState<string>("");
   const [eventTimeLength, setEventTimeLength] = useState<number>(60);
@@ -100,18 +100,20 @@ const createCalendar = () => {
     console.log("id is", selectionInfo.event.id);
     calendarApi.getEventById(selectionInfo.event.id)?.remove();
   };
-  const calendarRef = useRef<FullCalendar>(null!);
+  const calendarRef = useRef<FullCalendar>(null);
   useEffect(() => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     console.log("today is ", today);
-    const calendarApi = calendarRef.current.getApi();
-    if (window.innerWidth < 550) {
-      calendarApi.changeView("timeGridDay");
-    } else {
-      calendarApi.changeView("timeGridWeek");
+    if (calendarRef.current) {
+      const calendarApi = calendarRef.current.getApi();
+      if (window.innerWidth < 550) {
+        calendarApi.changeView("timeGridDay");
+      } else {
+        calendarApi.changeView("timeGridWeek");
+      }
     }
-  }, []);
+  }, [calendarRef]);
   return (
     <div
       css={css`
@@ -119,7 +121,6 @@ const createCalendar = () => {
         flex: 1;
         height: 100%;
         flex-direction: column;
-        /* padding: 20px; */
       `}
     >
       <div
@@ -128,7 +129,6 @@ const createCalendar = () => {
         `}
       >
         <StepTitle title="会議内容を入力" step={1} />
-
         <div
           css={css`
             display: flex;
@@ -137,33 +137,12 @@ const createCalendar = () => {
             margin: 4px 24px;
           `}
         >
-          <input
-            css={css`
-              flex-grow: 1;
-              max-width: 200px;
-              width: 100px;
-              border: none;
-              margin: 0;
-              color: ${colors.dark};
-              border-bottom: 2px solid ${colors.dark};
-              font-size: 16px;
-              ::placeholder {
-                color: ${colors.dark};
-              }
-            `}
+          <Input
             value={calendarName}
             onChange={(e) => setCalendarName(e.currentTarget.value)}
             placeholder="会議名"
           />
-          <input
-            css={css`
-              margin: 0;
-              width: 100px;
-              border: none;
-              color: ${colors.dark};
-              font-size: 16px;
-              border-bottom: 2px solid ${colors.dark};
-            `}
+          <Input
             type="number"
             value={eventTimeLength}
             onChange={(e) => setEventTimeLength(e.currentTarget.valueAsNumber)}
@@ -179,73 +158,36 @@ const createCalendar = () => {
         `}
       >
         <StepTitle title="会議予定の候補を選択" step={2} />
-        <FullCalendar
-          contentHeight={600}
-          allDaySlot={false}
-          locale="ja"
-          dayHeaderFormat={{
-            weekday: "short",
-            month: "numeric",
-            day: "numeric",
-            omitCommas: true,
-          }}
-          headerToolbar={{
-            right: "prev,next",
-            left: undefined,
-          }}
-          height={"100%"}
-          expandRows={true}
+        <CreateCalendar
           ref={calendarRef}
-          plugins={[timegridPlugin, listPlugin, interactionPlugin]}
-          selectable={true}
           select={handleDateSelect}
-          eventColor={colors.accent}
-          editable={true}
-          scrollTime={"09:00:00"}
           eventClick={eventMouseClick}
-          slotDuration="00:30:00"
-          selectLongPressDelay={200}
-          eventLongPressDelay={500}
-          eventAllow={(dateSpanApi) => {
-            if (
-              dateSpanApi.start.getTime() < getZeroTimeday(new Date()).getTime()
-            ) {
-              return false;
-            } else {
-              return true;
-            }
-          }}
         />
       </div>
-      <button
-        css={css`
-          width: 100%;
-          background-color: ${colors.accent};
-          border-radius: 20px;
-          margin: 8px 32px;
-          max-width: 300px;
-          padding: 12px 8px;
-          border: none;
-          align-self: center;
-          color: ${colors.white};
-          font-weight: bold;
-        `}
+      <LargeButton
         onClick={() => {
-          const calendarApi = calendarRef.current.getApi();
-          if (calendarName === "") {
-            alert("イベント名を入力してください");
-          } else if (calendarApi.getEvents().length === 0) {
-            alert("日程を1つ以上選択してください");
-          } else {
-            console.log("events is", calendarApi.getEvents());
-            uploadCalendar({ calendarApi, calendarName, id });
-            saveCalendarList({ id: id, name: calendarName });
-            router.replace(`calendar/${id}`);
+          console.log("aiueo", calendarRef.current);
+          if (calendarRef.current) {
+            const calendarApi = calendarRef.current.getApi();
+            if (calendarName === "") {
+              alert("イベント名を入力してください");
+            } else if (calendarApi.getEvents().length === 0) {
+              alert("日程を1つ以上選択してください");
+            } else {
+              console.log("events is", calendarApi.getEvents());
+              uploadCalendar({ calendarApi, calendarName, id });
+              saveCalendarList({ id: id, name: calendarName });
+              router.replace(`calendar/${id}`);
+            }
           }
         }}
+        css={css`
+          position: fixed;
+          bottom: 0px;
+        `}
       >
         OK
-      </button>
+      </LargeButton>
     </div>
   );
 };

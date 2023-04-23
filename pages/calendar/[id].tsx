@@ -36,7 +36,7 @@ import { currentCalendarAtom, currentEventsAtom } from "../../recoil";
 import { confirmEvents } from "../../functions/updateCalendar";
 import { colors } from "../../styles/colors";
 import { css } from "@emotion/react";
-import StepTitle from "../../components/StepTitle";
+import StepTitle from "../../components/Title/StepTitle";
 import LinkIcon from "../../public/link.svg";
 import CloseIcon from "../../public/cross.svg";
 import Modal from "react-modal";
