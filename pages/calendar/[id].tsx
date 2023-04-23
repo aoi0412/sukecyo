@@ -447,9 +447,9 @@ const calendarPage: NextPage = () => {
                   const start = new Date(event.start);
                   const end = new Date(event.end);
                   console.log(start.getTime() > end.getTime() ? -1 : 1);
-                  const formatDate = `${start.getMonth()}/${start.getDate()}(${
-                    weekChars[start.getDay()]
-                  })`;
+                  const formatDate = `${
+                    start.getMonth() + 1
+                  }/${start.getDate()}(${weekChars[start.getDay()]})`;
                   const formatTime = `${start.getHours()}:${
                     start.getMinutes() < 10
                       ? `0${start.getMinutes()}`
