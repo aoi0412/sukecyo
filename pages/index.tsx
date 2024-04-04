@@ -30,7 +30,16 @@ const Home: NextPage = () => {
     getCalendarList().then((tmpCalendarList) => {
       console.log("get", tmpCalendarList);
       getCalendarListData(tmpCalendarList).then((calendarList) => {
-        if (calendarList.length !== 0) setCalendarList(calendarList);
+        if (calendarList.length !== 0) {
+          const sortedCalendarList = calendarList.sort((a, b) => {
+            return a.confirmedEvent === b.confirmedEvent
+              ? 0
+              : a.confirmedEvent
+              ? 1
+              : -1;
+          });
+          setCalendarList(calendarList);
+        }
       });
     });
   }, []);
