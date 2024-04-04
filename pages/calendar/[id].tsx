@@ -124,8 +124,8 @@ const calendarPage: NextPage = () => {
     return (
       <div>
         日程は確定しました。
-        <p>{calendarData?.confirmedEvent.end.toString()}</p>
         <p>{calendarData?.confirmedEvent.start.toString()}</p>
+        <p>{calendarData?.confirmedEvent.end.toString()}</p>
         {calendarData?.confirmedEvent.joinMember.map((id) => (
           <div key={id}>{calendarData.joinMember[id]}</div>
         ))}
