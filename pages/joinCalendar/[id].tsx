@@ -20,7 +20,6 @@ import CheckIcon from "../../public/check.svg";
 import { google } from "googleapis";
 import GoogleIcon from "../../public/google.svg";
 import { event, eventForJoin } from "../../types/calendar";
-import { baseURL } from "../../baseURL";
 
 const calendarPage: NextPage = () => {
   const router = useRouter();
@@ -39,6 +38,7 @@ const calendarPage: NextPage = () => {
       name: string;
     }[]
   >([]);
+  const [baseURL, setBaseURL] = useState<string>("");
   const handleEventSelect = (selectionInfo: EventClickArg) => {
     console.log("selectionInfo: ", selectionInfo); // 選択した範囲の情報をconsoleに出力
     let tmpEventData = [...selectedEvents];
@@ -68,6 +68,9 @@ const calendarPage: NextPage = () => {
   const calendarRef = useRef<FullCalendar>(null!);
 
   useEffect(() => {
+    const tmpBaseURL = window.location.origin;
+    if (!tmpBaseURL) alert("URLが取得できませんでした");
+    setBaseURL(tmpBaseURL);
     if (
       typeof router.query.memberId === "string" &&
       typeof router.query.memberName === "string"

@@ -3,13 +3,16 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { fetchedCalendar } from "../types/googleCalendar";
-import { baseURL } from "../baseURL";
 
 export default function Callback() {
   const [calendars, setCalendars] = useState<fetchedCalendar[]>([]);
   const [selectedList, setSelectedList] = useState<fetchedCalendar[]>([]);
   const router = useRouter();
+  const [baseURL, setBaseURL] = useState<string>("");
   useEffect(() => {
+    const tmpBaseURL = window.location.origin;
+    if (!tmpBaseURL) alert("URLが取得できませんでした");
+    setBaseURL(tmpBaseURL);
     const code = router.query.code;
     console.log("run", router);
     if (!code) return;

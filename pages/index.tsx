@@ -12,7 +12,6 @@ import {
 import { calendar } from "../types/calendar";
 import { css } from "@emotion/react";
 import { colors } from "../styles/colors";
-import { baseURL } from "../baseURL";
 import { deleteCalendarList } from "../functions/localStorage";
 import EditIcon from "../public/edit.svg";
 import CloseIcon from "../public/cross.svg";
@@ -22,7 +21,12 @@ import TrashIcon from "../public/trash.svg";
 const Home: NextPage = () => {
   const [calendarList, setCalendarList] = useState<calendar[]>([]);
   const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [baseURL, setBaseURL] = useState<string>("");
+
   useEffect(() => {
+    const tmpBaseURL = window.location.origin;
+    if (!tmpBaseURL) alert("URLが取得できませんでした");
+    setBaseURL(tmpBaseURL);
     getCalendarList().then((tmpCalendarList) => {
       console.log("get", tmpCalendarList);
       getCalendarListData(tmpCalendarList).then((calendarList) => {

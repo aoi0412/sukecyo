@@ -3,19 +3,20 @@ import { doc, getFirestore, setDoc, writeBatch } from "firebase/firestore";
 import { firebaseApp } from "../firebase";
 import { calendar, calendarMember, event } from "../types/calendar";
 import { showError } from "./error";
-import { baseURL } from "../baseURL";
 
 type uploadCalendarProp = {
   calendarApi: CalendarApi;
   calendarName?: string;
   id: string;
   joinMember?: calendarMember;
+  baseURL?: string;
 };
 export const uploadCalendar = ({
   calendarApi,
   calendarName,
   id,
   joinMember,
+  baseURL,
 }: uploadCalendarProp) => {
   const db = getFirestore(firebaseApp);
   const docRef = doc(db, "calendar", id);

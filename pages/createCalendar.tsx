@@ -15,6 +15,7 @@ import StepTitle from "../components/StepTitle";
 const createCalendar = () => {
   const [calendarName, setCalendarName] = useState<string>("");
   const [eventTimeLength, setEventTimeLength] = useState<number>(60);
+  const [baseURL, setBaseURL] = useState<string>("");
   const router = useRouter();
   const id: string = new Date().getTime().toString();
   const handleDateSelect = (selectionInfo: DateSelectArg) => {
@@ -102,6 +103,9 @@ const createCalendar = () => {
   };
   const calendarRef = useRef<FullCalendar>(null!);
   useEffect(() => {
+    const tmpBaseURL = window.location.origin;
+    if (!tmpBaseURL) alert("URLが取得できませんでした");
+    setBaseURL(tmpBaseURL);
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     console.log("today is ", today);
@@ -238,7 +242,7 @@ const createCalendar = () => {
             alert("日程を1つ以上選択してください");
           } else {
             console.log("events is", calendarApi.getEvents());
-            uploadCalendar({ calendarApi, calendarName, id });
+            uploadCalendar({ calendarApi, calendarName, id, baseURL });
             saveCalendarList({ id: id, name: calendarName });
             router.replace(`calendar/${id}`);
           }

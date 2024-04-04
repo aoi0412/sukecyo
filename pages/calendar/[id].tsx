@@ -41,7 +41,6 @@ import CloseIcon from "../../public/cross.svg";
 import Modal from "react-modal";
 import CheckIcon from "../../public/check.svg";
 import CopyIcon from "../../public/copy-alt.svg";
-import { baseURL } from "../../baseURL";
 
 const calendarPage: NextPage = () => {
   const weekChars = ["日", "月", "火", "水", "木", "金", "土"];
@@ -51,6 +50,7 @@ const calendarPage: NextPage = () => {
   const [eventData, setEventData] = useRecoilState(currentEventsAtom);
   const [shareComfirmEvent, setShareConfirmEvent] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [baseURL, setBaseURL] = useState<string>("");
 
   const getShareText = (docData: calendar) => {
     return docData.confirmedEvent
@@ -69,6 +69,9 @@ const calendarPage: NextPage = () => {
       : "";
   };
   useEffect(() => {
+    const tmpBaseURL = window.location.origin;
+    if (!tmpBaseURL) alert("URLが取得できませんでした");
+    setBaseURL(tmpBaseURL);
     if (typeof id === "string") {
       const db = getFirestore(firebaseApp);
       const docRef = doc(db, "calendar", id);

@@ -6,12 +6,16 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const { host } = req.headers;
+  // プロトコルを追加する必要がある場合は、以下のように行います（httpまたはhttpsを適切に選択）
+  const protocol = req.headers["x-forwarded-proto"] || "http";
+  const baseUrl = `${protocol}://${host}`;
   const { accessToken } = req.body;
 
   const oauth2Client = new google.auth.OAuth2({
     clientId: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
     clientSecret: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_SECRET,
-    redirectUri: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URL,
+    redirectUri: baseUrl + "/callback",
   });
 
   // 認証情報を設定
