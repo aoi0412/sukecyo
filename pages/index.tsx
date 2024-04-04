@@ -38,7 +38,7 @@ const Home: NextPage = () => {
               ? 1
               : -1;
           });
-          setCalendarList(calendarList);
+          setCalendarList(sortedCalendarList);
         }
       });
     });
